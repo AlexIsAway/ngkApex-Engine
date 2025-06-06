@@ -83,7 +83,7 @@ void LibapxDefineSelect(string commandName) {
 
 
 // @spawn marine 3;@tint 255;@unitvar test;@spawn marine 2;@unitvar -add test;@scale 2 
-
+// Holy crap it works now - 1/12/2025
 // LibapxCommandUnitvar
 // ============================
 // Swaps the unit of selected units.
@@ -91,39 +91,56 @@ void LibapxCommandUnitvar(int user, unitgroup u, string argv, int spawningCount,
 	string unitvarprefix = "unitvar_"+IntToString(user)+"_";
 	unitgroup newUG;
 	bool modAdd = false;
+	bool modRemove = false;
 
 	//Remove, and check for, modifiers.
 	if( StringFind(argv, "-add", c_stringNoCase) != -1 ) {
 		modAdd = true;
 		argv = StringReplaceWord(argv, "-add",  "", 1, c_stringNoCase);
 	} 
+	if( StringFind(argv, "-remove", c_stringNoCase) != -1 ) {
+		modRemove = true;
+		argv = StringReplaceWord(argv, "-remove",  "", 1, c_stringNoCase);
+	} 
 	
-	if (!(modAdd)) {
-
+	if (!(modAdd) && (modRemove)) {
+		newUG = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv, 2));
 		if (StringWord(argv,2) != "") {
-			DataTableValueRemove(true, unitvarprefix + StringWord(argv, 2));
-			DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , u);
+			UnitGroupRemoveUnitGroup(newUG,u);
 		} else {
 			LibapxPrintOutput(user, "Provide a name for the unitgroup");
 		}
 
 	}
-	else {
+	else { 
+		//parameter -add can create a new unitgroup to add a unit to if one doesn't exist yet.
 		if (StringWord(argv,2) != "") {
 			newUG = DataTableGetUnitGroup(true, unitvarprefix + StringWord(argv, 2));
-			UnitGroupAddUnitGroup(newUG, u);
-			DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , newUG);
+			if (!(DataTableValueExists(true,unitvarprefix + StringWord(argv, 2)))){
+				if (StringWord(argv,2) != "") {
+					DataTableValueRemove(true, unitvarprefix + StringWord(argv, 2));
+					DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , u);
+				} else {
+					LibapxPrintOutput(user, "Provide a name for the unitgroup");
+				}
+
+			}
+			else {
+				UnitGroupAddUnitGroup(newUG, u);
+				DataTableSetUnitGroup(true, unitvarprefix + StringWord(argv, 2) , newUG);
+			}
 		} else {
 			LibapxPrintOutput(user, "Provide a name for the unitgroup");
 		}
 	}
 
 }
+
 void LibapxDefineUnitvar(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -add bobross <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3  "
+		" This command makes the unit(s) have a name to be refered to later with @context. It does very little on it's own. <br> @unitvar [modifier] [name] <br> The modifier for this command is -add, this modifier changes the commands default behavior of replacing the variable with the new one you set, and instead adds it to the new one. <br> Examples: <br> @unitvar bob <br> @unitvar -remove bob;@context bob;@kill <br> @unitvar -add bobross <br> @spawn marauder;@unitvar bobross;@spawn marine;@context bobross;@scale 3  "
 	);
 }
 
@@ -1503,11 +1520,9 @@ void LibapxCommandHeight(int user, unitgroup u, string argv, int spawningCount, 
 	time = StringToFixed( param );
 	if(StringContains(argv, "+", c_stringAnywhere, false)) {
 		addition = true;
-		argv = StringReplace(argv, "+", 1, StringLength(argv));
 	} 
 	else if(StringContains(argv, "-", c_stringAnywhere, false)) {
 		subtraction = true;
-		argv = StringReplace(argv, "-", 1, StringLength(argv));
 	}
 
 	UnitGroupLoopBegin(g);
@@ -1520,14 +1535,19 @@ void LibapxCommandHeight(int user, unitgroup u, string argv, int spawningCount, 
 		LibapxUnitColossusRemove(UnitGroupLoopCurrent());
 		if(!addition && !subtraction) {
 			UnitSetHeight( UnitGroupLoopCurrent(), height, time );
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@height", argv);
 		}
 		if(addition) {
 			UnitSetHeight( UnitGroupLoopCurrent(), height+currentHeight, time);
+			argv = "@height " + FixedToString(height+currentHeight,6);
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@height", argv);
 		}
 		else if(subtraction) {
-			UnitSetHeight( UnitGroupLoopCurrent(), height-currentHeight, time);
+			UnitSetHeight( UnitGroupLoopCurrent(), height+currentHeight, time);
+			argv = "@height " + FixedToString(height+currentHeight,6);
+			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@height", argv);
 		}
-		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@height", argv);
+
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
@@ -2701,10 +2721,16 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
 	bool usingAcquired;
 	bool usingHover;
 	bool usingContext;
+	bool noCache;
+	
+
+	int i = 1;
 
 	unit target = libNtve_gf_AcquiredTarget();
 	unit hover = UnitGroupUnit(h,1);
 	unit group = UnitGroupUnit(DataTableGetUnitGroup(true, "unitvar_" + StringWord(argv,4)),1);
+
+
 	
 
     effect = LibapxCatalogGet(c_gameCatalogEffect, effect);
@@ -2732,21 +2758,30 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
         argv =  StringReplaceWord(argv, "-context", "", 1, c_stringNoCase);
         usingContext = true;
     }
+	if(StringFind(argv, "-nocache" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
+        noCache = true;
+    }
 	
     if(usingContext == true){
         if( UnitGroupCount(g, c_unitCountAll) != 0 ) {
             UnitGroupLoopBegin(g);
             while(!UnitGroupLoopDone()) {
                 if( libNtve_gf_UnitCanCreateEffectOnUnit(UnitGroupLoopCurrent(), effect, group) ) {
+
                     UnitCreateEffectUnit(UnitGroupLoopCurrent(), effect, group);
-                }
+				}
+                
                 else {
+					if(gv_LibapxPlayer[user].helpMessages) {
                     LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+					}
                 }
                 UnitGroupLoopStep();
             }
             UnitGroupLoopEnd();
         }
+		return;
     }
 
     if(usingHover == true){
@@ -2757,12 +2792,15 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                     UnitCreateEffectUnit(UnitGroupLoopCurrent(), effect, hover);
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    if(gv_LibapxPlayer[user].helpMessages) {
+						LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+						}
                 }
                 UnitGroupLoopStep();
             }
             UnitGroupLoopEnd();
         }
+		return;
     }
 
 	if(usingCoords){
@@ -2773,12 +2811,15 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                     UnitCreateEffectPoint(UnitGroupLoopCurrent(), effect, Point(StringToFixed(StringWord(argv, 3)), StringToFixed(StringWord(argv, 4))));
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    if(gv_LibapxPlayer[user].helpMessages) {
+						LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+						}
                 }
                 UnitGroupLoopStep();
             }
             UnitGroupLoopEnd();
         }
+		return;
     }
 
 		if(usingAcquired == true){
@@ -2789,12 +2830,15 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                     UnitCreateEffectUnit(UnitGroupLoopCurrent(), effect, libNtve_gf_AcquiredTarget());
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    if(gv_LibapxPlayer[user].helpMessages) {
+						LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+						}
                 }
                 UnitGroupLoopStep();
             }
             UnitGroupLoopEnd();
         }
+		return;
     }
 
 	if(usingAcquired == true){
@@ -2811,6 +2855,7 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
             }
             UnitGroupLoopEnd();
         }
+		return;
     }
 
     if(usingCursor == true){
@@ -2819,15 +2864,20 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
             while(!UnitGroupLoopDone()) {
                 if( libNtve_gf_PlayerCanCreateEffectAtPoint(user, effect, gv_LibapxPlayer[user].mousePosition) ) {
                     UnitCreateEffectPoint(UnitGroupLoopCurrent(), effect, gv_LibapxPlayer[user].mousePosition);
+					if (!noCache) {
                     LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect -point", argv);
+					}
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    if(gv_LibapxPlayer[user].helpMessages) {
+						LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+						}
                 }
                 UnitGroupLoopStep();
             }
             UnitGroupLoopEnd();
         }
+		return;
     }
 
     if(usingCursor == false && usingAcquired == false && usingCoords == false && usingHover == false && usingContext == false){
@@ -2836,10 +2886,14 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
             while(!UnitGroupLoopDone()) {
                 if( libNtve_gf_PlayerCanCreateEffectOnUnit(user, effect, UnitGroupLoopCurrent()) ) {
                     PlayerCreateEffectUnit(user, effect, UnitGroupLoopCurrent());
-                    LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect", argv);
+					if (!noCache) {
+						LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@effect", argv);
+					}
                 }
                 else {
-                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                    if(gv_LibapxPlayer[user].helpMessages) {
+						LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+						}
                 }
                 UnitGroupLoopStep();
             }
@@ -2850,7 +2904,9 @@ void LibapxCommandEffect(int user, unitgroup u, string argv, int spawningCount, 
                 PlayerCreateEffectPoint(user, effect, gv_LibapxPlayer[user].mousePosition);
             }
             else {
-                LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+                if(gv_LibapxPlayer[user].helpMessages) {
+                    LibapxPrintError(user, "<c val=\"ff0000\">Unable to create the effect.</c>");
+					}
             }
         }
     }
@@ -2861,7 +2917,7 @@ void LibapxDefineEffect(string commandName) {
     LibapxCommandsGuideEntrySet(
         gv_CommandsGuideEntryUnit, 
         commandName, 
-        " This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield <br> @effect RavasaurLM -point <br> @effect RavasaurLM -coord 122.5 122.5 <br> @effect RavasaurLM -hover <br> @effect RavasaurLM -acquired <br> @unitvar MyContextGroup <br> @effect RavasaurLM -context MyContextGroup"
+        " This command creates an effect at a units position. <br> @effect [effectname] <br> Examples: <br> @effect MercenaryShield <br> @effect RavasaurLM -point <br> @effect RavasaurLM -coord 122.5 122.5 <br> @effect RavasaurLM -hover <br> @effect RavasaurLM -acquired <br> @unitvar MyContextGroup <br> @unitvar Name;@effect RavasaurLM -context ${$Player()}_Name"
     );
 }
 
@@ -3023,6 +3079,13 @@ void LibapxCommandRadius(int user, unitgroup u, string argv, int spawningCount, 
 		}
 	}
 
+	// for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
+	// 	tmpu = UnitGroupUnit(u, i);
+	// 	UnitSetPropertyFixed(tmpu, c_unitPropRadius,StringToFixed(val));
+	
+	// }
+
+
 	return;
 }
 void LibapxDefineRadius(string commandName) {
@@ -3043,8 +3106,15 @@ void LibapxDefineRadius(string commandName) {
 void LibapxCommandState(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	string param = StringCase( StringWord( argv, 2 ), false );
 	int state;
+	bool nocache = false;
 	bool status = false;
 	unitgroup g = u;
+
+	if(StringFind(argv, "-nocache" ,c_stringNoCase) != -1 ) {
+        argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
+        nocache = true;
+    }
+
 
 	// get 1st parameter as the state option
 	if( param == "fidget" ) {
@@ -3096,7 +3166,9 @@ void LibapxCommandState(int user, unitgroup u, string argv, int spawningCount, s
 	while(!UnitGroupLoopDone()) {
 		
 		UnitSetState( UnitGroupLoopCurrent(), state, status );
+		if(!nocache){
 		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@state", argv);
+		}
 		UnitGroupLoopStep();
 	}
 	UnitGroupLoopEnd();
@@ -3119,12 +3191,32 @@ void LibapxCommandOrder(int user, unitgroup u, string argv, int spawningCount, s
     unitgroup target;
     unit targetUnit;
     point targetPoint;
+	bool useAcquired;
     bool useTargetUnit;
     bool useTargetPoint;
+	bool useHover;
     string abilityName = StringWord(argv, 2);
     int abilityIndex;
+	unitgroup h = DataTableGetUnitGroup(true,"unitvar_Hover_" + IntToString(user));
+	unit hover = UnitGroupUnit(h,1);
 
-    if(StringWord(argv, 2) == "") {
+    if( StringFind(argv, "-cast", c_stringNoCase) != -1 ) {
+        useTargetUnit = true;
+        argv = StringReplaceWord(argv, "-cast",  "", 1, c_stringNoCase);
+		abilityName = StringWord(argv, 2);
+		abilityIndex = StringToInt(StringWord(argv, 3));
+		// abilityName = "ZeratulBlink";
+		// abilityIndex = 0;
+		// UnitAbilityChangeLink(UnitGroupUnit(u,1),"Blink","ZeratulBlink");
+        UISetTargetingOrder(PlayerGroupSingle(user),u,Order(AbilityCommand(abilityName, abilityIndex)),false);
+		// LibapxPrintOutput(user, abilityName + IntToString(abilityIndex));
+		return;
+    } 
+
+	abilityName = LibapxCatalogGet(c_gameCatalogAbil,abilityName);
+	
+
+    if(abilityName == "") {
         LibapxPrintError(user, "Must provide ability name");
         return;
     }
@@ -3135,6 +3227,7 @@ void LibapxCommandOrder(int user, unitgroup u, string argv, int spawningCount, s
     else {
         abilityIndex = 0;
     }
+	
 
 
     //Remove, and check for, modifiers
@@ -3143,6 +3236,15 @@ void LibapxCommandOrder(int user, unitgroup u, string argv, int spawningCount, s
         argv = StringReplaceWord(argv, "-unit",  "", 1, c_stringNoCase);
         unitvar = StringWord(argv, 4);
 
+    } 
+
+	if( StringFind(argv, "-acquired", c_stringNoCase) != -1 ) {
+        useAcquired = true;
+        argv = StringReplaceWord(argv, "-acquired",  "", 1, c_stringNoCase);
+    } 
+	if( StringFind(argv, "-hover", c_stringNoCase) != -1 ) {
+        useHover = true;
+        argv = StringReplaceWord(argv, "-hover",  "", 1, c_stringNoCase);
     } 
     
     if( StringFind(argv, "-point", c_stringNoCase) != -1 ) {
@@ -3174,6 +3276,20 @@ void LibapxCommandOrder(int user, unitgroup u, string argv, int spawningCount, s
             c_orderQueueReplace
         );
     }
+	else if(useAcquired) {
+        UnitGroupIssueOrder(
+            u,
+            OrderTargetingUnit(AbilityCommand(abilityName, abilityIndex), libNtve_gf_AcquiredTarget()),
+            c_orderQueueReplace
+        );
+    }
+	else if(useHover) {
+        UnitGroupIssueOrder(
+            u,
+            OrderTargetingUnit(AbilityCommand(abilityName, abilityIndex), hover),
+            c_orderQueueReplace
+        );
+    }
     else {
         UnitGroupIssueOrder(
             u,
@@ -3186,6 +3302,111 @@ void LibapxDefineOrder(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryUnit, 
 		commandName, 
-		"Issues an order to the unit. <br> Examples: <br>@order Blink 0 -point <br>@order Stimpack 0"
+        "Issues an order to the unit. <br> Examples: <br> @order attack 0 -point <br> @order Move 0 -point 126 126 ; @order Stimpack 0 <br> 1. @unitvar -add apple <br> 2. Select different unit: @order attack 0 -unit ${$Player()}_apple <br> Target cursor hovered unit: <br> @order attack 0 -hover <br> Target a unit already acquired by the unit: <br> @order attack 0 -acquired"	);
+}
+
+// LibapxCommandAbilities
+// =================
+// prints a list of the weapons a unit currently has
+void LibapxCommandAbilities(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int count;
+	int listStart = StringToInt(StringWord(argv,2));
+	if (StringWord(argv,2) == ""){
+		listStart = 0;
+	}
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		// print unit name and ID
+		LibapxPrintText(PlayerGroupSingle(user), StringToText( "> Unit [ID: " + LibapxUnitId(UnitGroupLoopCurrent()) + "] ") + LibapxUnitGetName(UnitGroupLoopCurrent()) + StringToText(" abilities:"));
+
+		count = UnitAbilityCount(UnitGroupLoopCurrent());
+		if( count > 0 ) {
+			while( count > listStart ) {
+				LibapxPrintOutput(user, " [" +IntToString(count-1) + "] " + UnitAbilityGet(UnitGroupLoopCurrent(), count));
+				count -= 1;
+			}
+			LibapxPrintOutput(user, "Total:  " + IntToString(UnitAbilityCount(UnitGroupLoopCurrent())));
+		}
+		else { // count == 0, no behaviors
+			LibapxPrintError(user, "This unit has no abilities");
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	return;
+}
+void LibapxDefineAbilities(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" This command prints out a list of all of a unit's abilities. <br> <c val=\"FF0000\">Syntax:</c> @abilities [lowestIndex] <br> Examples: <br> @abilities <br> @spawn NovaHero;@abilities 20 "
 	);
 }
+
+
+// LibapxCommandAddAbility
+// =================
+// adds ability to the unit but only if the unit has less than 25 abilities. Highly volatile command.
+void LibapxCommandAddAbility(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	string ability;
+	string replacelink;
+	string input = argv;
+	bool nocache = false;
+	bool replace = false;
+
+	if( StringFind(argv, "-replace", c_stringNoCase) != -1 ) {
+        replace = true;
+        argv = StringReplaceWord(argv, "-replace",  "", 1, c_stringNoCase);
+    } 
+
+	ability = StringWord(argv,2);
+	replacelink = StringWord(argv,3);
+	ability = LibapxCatalogGet(c_gameCatalogAbil,ability);
+
+	if (replace) {
+		UnitGroupLoopBegin(u);
+		while(!UnitGroupLoopDone()) {
+			UnitAbilityChangeLink(UnitGroupLoopCurrent(),ability,replacelink);
+			if (!nocache) {
+				LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@addability", input);
+				}
+				UnitGroupLoopStep();			
+			}
+			UnitGroupLoopEnd();
+	return;
+	}
+
+	
+
+	if (ability != null) {
+		UnitGroupLoopBegin(u);
+		while(!UnitGroupLoopDone()) {
+			
+			if (UnitAbilityCount(UnitGroupLoopCurrent()) < 25) {
+				UnitAbilityAdd(UnitGroupLoopCurrent(),ability);
+				if (!nocache) {
+					LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@addability", argv);
+				}
+			} else {
+				LibapxPrintError(user, "Too many abilities. This unit has " + IntToString(UnitAbilityCount(UnitGroupLoopCurrent())) + " abilities and can no longer add any more. Type  <c val=\"FFFFFF\">@abilities 20</c>  to see check ability list");
+			}
+
+			UnitGroupLoopStep();
+			
+		}
+		UnitGroupLoopEnd();
+		return;
+	} else {
+		LibapxPrintError(user, "Ability does not exist.");
+		
+	}
+}
+void LibapxDefineAddAbility(string commandName) {
+	LibapxCommandsGuideEntrySet(
+		gv_CommandsGuideEntryUnit, 
+		commandName, 
+		" <c val=\"FF0000\">This is a dangerous command. <br> <c val=\"FF0000\">Use with caution.</c> <br> <c val=\"FF0000\">WARNING: <br> <c val=\"FF0000\">Reaching 33 abilities crashes SC2</c> <br> <c val=\"FF0000\">Apex has a 25 total ability limit <br> <c val=\"FF0000\">(this includes any preowned by the unit). Blizzard has yet to fix ability remove, so only adding abilities work.</c> <br>  <c val=\"FFFF00\">Syntax:</c> <br> @addability [ability] <br> Examples: <br> _upgrade StimpackOn;@addability Stimpack;@order Stimpack 0 <br> _upgrade Blink on;@addability Blink;>keypress key_b [@order Blink 0 -point]"
+	);
+}
+

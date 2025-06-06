@@ -14,6 +14,7 @@ static int UiAttachCheckList;
 static int ButtonCount;
 static int PointCount = 16;
 static int[16] PointDialogs;
+static int ClearButton;
 static string Points = "All Origin Center Damage Engine Hardpoint Head Hit Overhead Left Right Target Turret TurretY TurretZ Weapon";
 void LibapxUiAttachchkInit() {
     int i;
@@ -24,11 +25,19 @@ void LibapxUiAttachchkInit() {
 
     //Title
     LibapxCreateDialogTitle(LibapxUiAttachchk, 300, 40, 00, 40, "Attach Checker", gv_LibapxUiHeader1, 200);
+    
 
     //Titles
     LibapxCreateDialogLabel(LibapxUiAttachchk , 300, 40, c_anchorTop, -160, 84, "Attach Points", gv_LibapxUiHeader1);
     LibapxCreateDialogLabel(LibapxUiAttachchk , 300, 40, c_anchorTop,  155, 84, "Displayed Points", gv_LibapxUiHeader1);
-  
+    // LibapxCreateDialogLabel(LibapxUiAttachchk , 300, 40, c_anchorBottom,  -135, 42, "Double-Click To Close", gv_LibapxUiHeader5);
+
+    //Title Remove Button
+    ClearButton = LibapxCreateDialogBtn(LibapxUiAttachchk, 30, 30, c_anchorTopLeft, 50, 100 + (510), StringWord(Points, i), "" );
+    LibapxCreateDialogBtnIcon(LibapxUiAttachchk, ClearButton, 20, 20, gv_LibapxUiIconReset);
+    LibapxCreateDialogLabel(LibapxUiAttachchk, 100, 60, c_anchorTopLeft, 80, 102 + (510), "Reset", gv_LibapxUiHeader4);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxUiAttachpointDoubleclickRemove"), c_playerAny, ClearButton, c_triggerControlEventTypeClick);
+
 
     //Generate Buttons
     i = 1;
@@ -37,16 +46,19 @@ void LibapxUiAttachchkInit() {
         LibapxCreateDialogBtnIcon(LibapxUiAttachchk, PointDialogs[i-1], 20, 20, gv_LibapxUiIconX);
         LibapxCreateDialogLabel(LibapxUiAttachchk, 100, 60, c_anchorTopLeft, 80, 102 + (30*i), StringWord(Points, i), gv_LibapxUiHeader4);
         TriggerAddEventDialogControl(TriggerCreate("LibapxUiClickPoints" + StringWord(Points, i)), c_playerAny, PointDialogs[i-1], c_triggerControlEventTypeClick);
+        TriggerAddEventDialogControl(TriggerCreate("LibapxUiAttachpointDoubleclickRemove"), c_playerAny, PointDialogs[i-1], c_triggerControlEventTypeDoubleClick);
 
         i+= 1;
     }
+
+    
 
     //Points list
     UiAttachCheckList = LibapxCreateDialogList(LibapxUiAttachchk, 330, (30*i)-30, c_anchorTopRight, 50, 130);
 
   //Trigger for command selection
   TriggerAddEventDialogControl(TriggerCreate("LibapxUiAttachpointSelect"), c_playerAny, UiAttachCheckList, c_triggerControlEventTypeSelectionChanged);
-
+  TriggerAddEventDialogControl(TriggerCreate("LibapxUiAttachpointDoubleclickRemove"), c_playerAny, UiAttachCheckList, c_triggerControlEventTypeClick);
 }
 
 void LibapxUiAttachchkInitPlayer(int player) {
@@ -82,17 +94,40 @@ static void SetTargetAttachCheck(int p) {
 static void ApplyAttachpoints(int p,string attachment, int idx, string tc) {
     unit u;
     unitgroup ug = UnitGroupSelected(p);
+    int tagId;
     ug = UnitGroupFilterPlayer(ug, p, -1);
     u = UnitGroupUnit(ug,1);
 
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), DefaultAttachPoint, " AttachModelOffset Beacon_Nova {} {"+attachment + "}");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelSwap EditorHelper");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetTeamColor {"+tc+"} {"+tc+"}");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + IntToString(idx) + "Alias");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + "attachmentsforchk");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005 ");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
-    ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetTintColor {255,255,255 1} ");
+
+    //ORIGINAL MADE BY SEROBLISS
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), DefaultAttachPoint, " AttachModelOffset Beacon_Nova {} {"+attachment + "}");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "ModelSwap EditorHelper");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetTeamColor {"+tc+"} {"+tc+"}");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + IntToString(idx) + "Alias");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "AliasAdd " + "attachmentsforchk");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 0.0005 ");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
+    // ActorSendTo(libNtve_gf_MainActorofUnit(u), "::Main", "SetTintColor {255,255,255 1} ");
+
+    //NEW MADE BY NGOKERZ
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_AttachChecker", "AliasAdd Apex_AttachChecker_Old"); 
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), DefaultAttachPoint, " AttachModelOffset Apex_AttachChecker EditorHelper {"+attachment + "}");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_AttachChecker", "AliasAdd Apex_AttachChecker_New"); 
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_AttachChecker_Old", "AliasRemove Apex_AttachChecker_New"); 
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_AttachChecker", "AliasAdd Apex_AttachChecker_Old"); 
+    //Same AttachChecker Adjustments
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "ModelSwap EditorHelper");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "SetTeamColor {"+tc+"} {"+tc+"}");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "AliasAdd " + IntToString(idx) + "Alias");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "AliasAdd " + "attachmentsforchk");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "SetScale 0.0005 ");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "Apex_AttachChecker_New", "SetTintColor {255,255,255 1} ");
+
+
+
+
+
 };
 
 static void HighlightAttachpoint(int p, string attachment, int idx) {
@@ -103,8 +138,26 @@ static void HighlightAttachpoint(int p, string attachment, int idx) {
     u = UnitGroupUnit(ug,1);
     ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "SetScale 1,1,1.5 "+FixedToString(RandomFixed(.35,.45),2)+" ");
     ActorSendTo(libNtve_gf_MainActorofUnit(u), target, "SetScale 1.5,1.5,3 .4 ");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "HaloStop");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), target, "HaloStart");
+
 
 };
+
+static void RemoveAllAttachpoints(int p, string attachment, int idx) {
+    unit u;
+    unitgroup ug = UnitGroupSelected(p);
+    string target = IntToString(idx) + "Alias";
+    ug = UnitGroupFilterPlayer(ug, p, -1);
+    u = UnitGroupUnit(ug,1);
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), DefaultAttachPoint, "AliasRemove " + DefaultAttachPoint);
+    
+    Wait(.11, c_timeGame);
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "SetScale 0.0005 .1 ");
+    Wait(.11, c_timeGame);
+    ActorSendTo(libNtve_gf_MainActorofUnit(u), "attachmentsforchk", "Destroy ");
+};
+
 static string[16][45] ListedPoints;
 
 static void ResetListedPoints(int p) {
@@ -174,6 +227,20 @@ bool LibapxUiAttachpointSelect(bool testConds, bool runActions) {
 
     return true;
 }
+
+bool LibapxUiAttachpointDoubleclickRemove(bool testConds, bool runActions) {
+    int p = EventPlayer();
+    int selected = DialogControlGetSelectedItem(UiAttachCheckList, p);
+    string attachpoint = ListedPoints[p][selected];
+    int i;
+    // LibapxPrintOutput(p,"FUCK U"); //DEBUG
+    RemoveAllAttachpoints(p, attachpoint, selected-1);
+
+
+
+    return true;
+}
+
 
 bool LibapxUiClickPointsAll(bool testConds, bool runActions) {
     UiClickPointsPopulate(EventPlayer(), "All");

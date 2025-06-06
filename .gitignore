@@ -1,0 +1,12 @@
+Base.SC2Data/*
+enUS.SC2Data/*
+ComponentList.SC2Components
+DocumentHeader
+DocumentInfo
+DocumentInfo.version
+GameData.version
+GameText.version
+PreloadAssetDB.txt
+Triggers
+Triggers.version
+Apex/.DS_Store

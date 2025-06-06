@@ -1,0 +1,15 @@
+
+//data_table_manager.galaxy
+string LibapxTManagerGetList(string baseTableString);
+int LibapxTManagerGetCount(string baseTableString);
+void LibapxTManagerCleanup(string baseTableString);
+bool LibapxTManagerRemoveValue(string baseTableString, string specifiedTableString);
+void LibapxTManagerSetInt(string baseTableString, string specifiedTableString, int value );
+void LibapxTManagerSetString(string baseTableString, string specifiedTableString, string value );
+void LibapxTManagerSetFixed(string baseTableString, string specifiedTableString, fixed value );
+void LibapxTManagerSetUnitgroup(string baseTableString, string specifiedTableString, unitgroup value );
+int LibapxTManagerGetInt(string baseTableString, string specifiedTableString );
+string LibapxTManagerGetString(string baseTableString, string specifiedTableString );
+fixed LibapxTManagerGetFixed(string baseTableString, string specifiedTableString );
+unitgroup LibapxTManagerGetUnitGroup(string baseTableString, string specifiedTableString );
+bool LibapxTManagerExists(string baseTableString, string specifiedTableString);

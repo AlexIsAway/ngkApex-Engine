@@ -353,6 +353,15 @@ void LibapxCommandLight(int user, unitgroup u, string argv, int spawningCount, s
 	if(light == "") { // get default lighting for terrain set
 		light = CatalogFieldValueGet(c_gameCatalogTerrain,  GameTerrainSet(), "Lighting", user);
 	}
+	if(light == "autolight") { // should restore autolight or choose new autolight idk
+		// light = CatalogFieldValueGet(c_gameCatalogTerrain,  GameTerrainSet(), "Lighting", user);
+		// GameSetToDLighting("Lighting");
+		GameSetToDLighting(StringWord(gv_LibapxPlayer[user].chatMsg, 3));
+		// GameTimeOfDaySet(GameTimeOfDayGet());
+		GameTimeOfDaySetLength(StringToFixed(StringWord(gv_LibapxPlayer[user].chatMsg, 4)));
+		return;
+	}
+	
 
 	light = LibapxCatalogGet(c_gameCatalogLight, light);
 	if(light == null) {
@@ -372,7 +381,7 @@ void LibapxDefineLight(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryAdmin, 
 		commandName, 
-		" This command changes the maps lighting. If no light is specific it'll reset the light to the maps default light. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !light [lightname] [duration] <br> Examples: <br> !light tassadar 5 <br> !light hyperion 1 ");
+		" This command changes the maps lighting. If no light is specific it'll reset the light to the maps default light. <br> This is an admin command so you must be a moderator or an admin to use it. <br> !light [lightname] [duration] <br> Restore map's day/night cycle with !light autolight [LightID] [TotalCycleDuration] <br> Examples: <br> !light tassadar 5 <br> !light hyperion 1 <br> !light autolight TemplateAuto 32");
 }
 
 // LibapxCommandRemovePlayer

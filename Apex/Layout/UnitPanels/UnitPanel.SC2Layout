@@ -48,6 +48,36 @@
 					<Frame type="BehaviorBar" name="BehaviorBar">
 						<Anchor side="Top" relative="$parent/$parent" pos="Min" offset="10"/>
 						<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="10"/>
+						<!--Additional Behavior Column made by Ngok-->
+						<!-- <Frame type="BehaviorIcon" name="BehaviorIcon14" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						</Frame>
+						<Frame type="BehaviorIcon" name="BehaviorIcon15" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent/BehaviorIcon14" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent/BehaviorIcon14" pos="Max" offset="0"/>
+						</Frame>
+						<Frame type="BehaviorIcon" name="BehaviorIcon16" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent/BehaviorIcon15" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent/BehaviorIcon15" pos="Max" offset="0"/>
+						</Frame>
+						<Frame type="BehaviorIcon" name="BehaviorIcon17" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent/BehaviorIcon16" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent/BehaviorIcon16" pos="Max" offset="0"/>
+						</Frame>
+						<Frame type="BehaviorIcon" name="BehaviorIcon18" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent/BehaviorIcon17" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent/BehaviorIcon17" pos="Max" offset="0"/>
+						</Frame>
+						<Frame type="BehaviorIcon" name="BehaviorIcon19" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent/BehaviorIcon18" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent/BehaviorIcon18" pos="Max" offset="0"/>
+						</Frame>
+						<Frame type="BehaviorIcon" name="BehaviorIcon20" template="BehaviorBar/BehaviorIconTemplate">
+							<Anchor side="Top" relative="$parent/BehaviorIcon19" pos="Max" offset="0"/>
+							<Anchor side="Right" relative="$parent/BehaviorIcon19" pos="Max" offset="0"/>
+						</Frame>
+						<Width val="96"/> -->
 					</Frame>
 					<Frame type="UnitWireframe" name="UnitWireframe">
 							<Anchor side="Left" relative="$parent" pos="Max" offset="20000"/>
@@ -116,6 +146,13 @@
 				<Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="6"/>
 				<Height val="250"/>
+				<!--Additional Attribute Labels by Ngokerz-->
+				<!-- <Frame type="InfoPaneHeroTemplate" name="InfoPaneHeroTemplate">
+					<Frame type="Label" name="AttributeLabel6">
+						<Anchor side="Top" relative="$parent/AttributeLabel5" pos="Max" offset="4"/>
+						<Anchor side="Left" relative="$parent/AttributeLabel5" pos="Min" offset="0"/>
+					</Frame>
+				</Frame> -->
 				<Frame type="Label" name="NameLabel">
 					<Visible val="false"/>
 					<Anchor side="Top" relative="$parent" pos="Max" offset="100"/>

@@ -151,15 +151,15 @@ void LibapxUiInitialize() {
 	int player;
 
 
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeTeamResourceButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false);
-	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeHelpMenuButton, false);
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeIdleWorkerButton, false); //default off
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, false); //default off
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeConsolePanel, false); //default off
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeArmyButton, false); //default off
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeResourcePanel, true); //default off but turned back on :)
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeTeamResourceButton, false); //default off
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeAllianceButton, false); //default off
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeSupply, true); //default off but I turned back on :)
+	UISetFrameVisible(PlayerGroupAll(), c_syncFrameTypeHelpMenuButton, true); //default off but I turned it on :)
 
 	//X colorpicker bars
 	//X Color picker perms
@@ -235,7 +235,7 @@ static void LibapxUiToolbarInit() {
 		c_anchorTopLeft, 
 		14, 
 		0, 
-		"Ngokerz Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier + "", 
+		"Apex Engine v" + IntToString(gv_LibapxBuildVersion) + "." + IntToString(gv_LibapxBuildSubVersion) + gv_LibapxBuildVersionModifier + "", 
 		gv_LibapxUiHeader4,
 		ColorWithAlpha(90,90,90,60));
 	

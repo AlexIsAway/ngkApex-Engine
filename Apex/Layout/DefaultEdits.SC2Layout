@@ -3,7 +3,7 @@
     <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer" file="GameUI">
         <!-- Timer  -->
         <Frame type="MissionTimePanel" name="MissionTimePanel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="230"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-305"/>
             <Color val="235,235,235"/>
 		    <Desaturated val="true"/>
@@ -141,4 +141,29 @@
             </Frame>
         </Frame>
     </Frame>
+
+
+ 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/ResourcePanel" file="GameUI">
+		<Anchor side="Right" relative="$parent" pos="1" offset="-150"/>
+        <Handle val="ResourceFrame"/>
+	</Frame>
+    <!-- <Frame type="MenuBar" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBarConsoleAnchor" file="GameUI">
+		<Anchor side="Left" relative="$parent" pos="Min" offset="100"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-295"/>
+		<Anchor side="Right" relative="$parent" pos="Min" offset="300"/>
+		<Height val="59"/>
+		<Width val="500"/>
+    </Frame> -->
+
+    <!-- <Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBar" file="GameUI">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="-300"/>
+	</Frame>
+    <Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBarConsoleAnchor" file="GameUI">
+		<Anchor side="Left" relative="$parent" pos="Mid" offset="-300"/>
+    </Frame> -->
+
+    
+
+
+
 </Desc>

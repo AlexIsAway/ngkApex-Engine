@@ -1,6 +1,6 @@
 //=========================================================
-//		Apex Roleplaying Engine
-//		Copyright (c) 2022, Apex Group
+//      Apex Roleplaying Engine
+//      Copyright (c) 2022, Apex Group
 //=========================================================
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
@@ -14,11 +14,27 @@ include "apex/variables/general_var_functions.galaxy"
 void LibapxVariableFunctionInitialize() {
 
 
+
+
+
+
     LibapxCommandsGuideSetVariableFunctionEntry(
         "Variable Syntax", 
         "Variable Syntax allows you to calculate mathamatical values within apex. It is united with _varset and $variablefunctions to allow many different results. <br> Examples Below: <br> ${1} //Prints 1 <br> ${1+5} //Prints 6 <br> ${2^3} // Prints 8 <br> ${(2 * (5 *(3+6)) / 15 -2)} // prints 4 <br> ${ $RandInt(1,10) // Prints a random integer from 1 to 10 } "
     ); 
     LibapxVariableFunctionCreate("Debug", LibapxVariableFunctionDebug);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxVariableFunctionPrefix+"Alive()", 
+        "Returns number based on if unit is alive or dead <br> Example: <br> ${$Alive()}"
+    );
+    LibapxVariableFunctionCreate("Alive", LibapxVariableFunctionAlive);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxVariableFunctionPrefix+"UnitID()", 
+        "Returns the current unit's UnitID <br> Example: <br> ${$UnitID()}"
+    );
+    LibapxVariableFunctionCreate("UnitID", LibapxVariableFunctionUnitID);
 
     LibapxCommandsGuideSetVariableFunctionEntry(
         gv_LibapxVariableFunctionPrefix+"Height()", 
@@ -39,6 +55,18 @@ void LibapxVariableFunctionInitialize() {
     LibapxVariableFunctionCreate("Player", LibapxVariableFunctionUnitPlayerNumber);
 
     LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"BehaviorCount()", 
+        "Returns the behavior count of the currently selected unit. <br> Example:$[&BehaviorCount(Stimpack)]"
+    ); 
+    LibapxStringFunctionCreate("BehaviorCount", LibapxVariableFunctionUnitBehaviorCount);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxVariableFunctionPrefix+"Resource()", 
+        "Returns current player's specific resource count <br> Based on given number. <br> Example:${$Resource(0)} <br> Resource <br> (0) Minerals <br> (1) Vespene Gas <br> (2) Terrazine Gas <br> (3) Custom Resource <br> (4) Supplies Used <br> (5) Supplies Made <br> (6) Supply Limit <br> (12) Minerals Gathered <br> (13) Vespene Gathered <br> (14) Terrazine Gathered <br> (15) Custom Gathered "
+    ); 
+    LibapxVariableFunctionCreate("Resource", LibapxVariableFunctionGetResources);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
         gv_LibapxVariableFunctionPrefix+"MouseX()", 
         "Returns the current mouse X position <br> Example: <br> ${$MouseX()}"
     ); 
@@ -51,6 +79,13 @@ void LibapxVariableFunctionInitialize() {
 
 
     LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxVariableFunctionPrefix+"UnitFacing()", 
+        "Returns the unit's facing direction in degrees <br> Example: <br> ${$UnitFacing()}"
+    ); 
+    LibapxVariableFunctionCreate("UnitFacing", LibapxVariableFunctionUnitFacing);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
         gv_LibapxVariableFunctionPrefix+"UnitX()", 
         "Returns the current unit X position <br> Example: <br> ${$UnitX()}"
     ); 
@@ -60,6 +95,7 @@ void LibapxVariableFunctionInitialize() {
     );
     LibapxVariableFunctionCreate("UnitX", LibapxVariableFunctionUnitX);
     LibapxVariableFunctionCreate("UnitY", LibapxVariableFunctionUnitY);
+    
 
     
     LibapxCommandsGuideSetVariableFunctionEntry(
@@ -67,7 +103,7 @@ void LibapxVariableFunctionInitialize() {
         "Returns a random real number between the two inputs, if no inputs are provided it's between 0 and 1. <br> Example: <br> ${$RandReal(1,5)}"
     );
     LibapxVariableFunctionCreate("RandReal", LibapxVariableFunctionRandomFixed);
-    LibapxVariableFunctionCreate("RandReal", LibapxVariableFunctionRandomFixed);
+    LibapxVariableFunctionCreate("RandFixed", LibapxVariableFunctionRandomFixed);
 
 
     LibapxCommandsGuideSetVariableFunctionEntry(
@@ -108,6 +144,141 @@ void LibapxVariableFunctionInitialize() {
     );
     LibapxVariableFunctionCreate("Round", LibapxVariableFunctionRound);
 
-    
 
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxVariableFunctionPrefix+"UnitCount()", 
+        "Returns the current context's unit count <br> Example: <br> ${UnitCount()}"
+    );
+    LibapxVariableFunctionCreate("UnitCount", LibapxVariableFunctionUnitCount);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxVariableFunctionPrefix+"UnitFacing()", 
+        "Returns the current unit facing <br> Example: <br> ${UnitFacing()}"
+    );
+    LibapxVariableFunctionCreate("UnitFacing", LibapxVariableFunctionUnitFacing);
+
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"String()", 
+        "Returns string <br> Example: <br> $[&String()]"
+    );
+    LibapxStringFunctionCreate("String", LibapxVariableFunctionString);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Length()", 
+        "Returns length of string <br> Example: <br> $[&Length(string)]"
+    );
+    LibapxStringFunctionCreate("Length", LibapxVariableFunctionLength);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Unit()", 
+        "Returns type of unit <br> Example: <br> $[&Unit()]"
+    );
+    LibapxStringFunctionCreate("Unit", LibapxVariableFunctionUnit);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Name()", 
+        "Returns name of unit <br> Example: <br> $[&Name()]"
+    );
+    LibapxStringFunctionCreate("Name", LibapxVariableFunctionName);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Desc()", 
+        "Returns apex desc of unit <br> Example: <br> $[&Desc()]"
+    );
+    LibapxStringFunctionCreate("Desc", LibapxVariableFunctionDesc);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Subtitle()", 
+        "Returns subtitle of unit <br> Example: <br> $[&Subtitle()]"
+    );
+    LibapxStringFunctionCreate("Subtitle", LibapxVariableFunctionSubtitle);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Reword()", 
+        "Returns string <br> $[&Reword(#timesreplaced replacedword replaceword [words!])] <br> Example: <br> $[&Reword(-1 You Myself I Hate You!)] <br> Output: I Hate Myself!"
+    );
+    LibapxStringFunctionCreate("Reword", LibapxVariableFunctionReplaceWord);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Rel()", 
+        "Returns unit's relative coordinates based on input. <br> Example: <br> $[&Rel(+0 +5)]"
+    );
+    LibapxStringFunctionCreate("Rel", LibapxVariableFunctionRelX);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Sub()", 
+        "Returns substring within string given two numbers <br> Example: <br> $[&Sub(2 10 Apples Are Stupid)] <br> Output: pples Are"
+    );
+    LibapxStringFunctionCreate("Sub", LibapxVariableFunctionStringSub);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Repeat()", 
+        "Repeat the string a number of times based on first input. <br> Example: <br> $[&Repeat(3 Hello World)] <br> Output: Hello WorldHello WorldHello World"
+    );
+    LibapxStringFunctionCreate("Repeat", LibapxVariableFunctionStringRepeat);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Word()", 
+        "Returns a word from the string <br> based on first input. <br> Example: <br> $[&Word(2 Apples Are Delicious)] <br> Output: Are"
+    );
+    LibapxStringFunctionCreate("Word", LibapxVariableFunctionStringWord);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Upper()", 
+        "Returns string in all UPPERCASE <br> Example: <br> $[&Upper(Pears are Pear Shaped)] <br> Output: PEARS ARE PEAR SHAPED"
+    );
+    LibapxStringFunctionCreate("Upper", LibapxVariableFunctionStringUpper);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"lower()", 
+        "Returns string in all lowercased <br> Example: <br> $[&lower(Bananas are Banana Shaped)] <br> Output: bananas are banana shaped"
+    );
+    LibapxStringFunctionCreate("lower", LibapxVariableFunctionStringLower);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"strcmp()", 
+        "Compares two words. Not case-sensitive. <br> Returns 1 if both match, else 0. <br> Example: <br> $[&strcmp(hello hello)] <br> Output: 1"
+    );
+    LibapxStringFunctionCreate("strcmp", LibapxVariableFunctionStringCompareInsensitive);
+    
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"strcmpi()", 
+        "Compares two words. Case-Sensitive. <br> Returns 1 if both match, else 0.<br> Example: <br> $[&strcmpi(hello Hello)] <br> Output: 0"
+    );
+    LibapxStringFunctionCreate("strcmpi", LibapxVariableFunctionStringCompare);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"Actor()", 
+        "Returns actor information <br> Can use ->Target <br> Example: <br> $[&Actor(->::Main model)]"
+    );
+    LibapxStringFunctionCreate("Actor", LibapxVariableFunctionStringGet);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"strcnt()", 
+        "Checks if string2 contains string1. Case-Sensitive. <br> Returns 1 if both match, else 0.<br> Example: <br> $[&strcnt(a Apple)] <br> Output: 0" 
+    );
+    LibapxStringFunctionCreate("strcnt", LibapxVariableFunctionStringContainsSensitive);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"strcnti()", 
+        "Checks if string2 contains string1. Not Case-Sensitive. <br> Returns 1 if both match, else 0.<br> Example: <br> $[&strcnti(a Apple)] <br> Output: 1" 
+    );
+    LibapxStringFunctionCreate("strcnti", LibapxVariableFunctionStringContainsInsensitive);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"strfind()", 
+        "Find string1's position in string2. Case-Sensitive. <br> Example: <br> $[&strfind(I Where am I?)] <br> Output: 10"
+    );
+    LibapxStringFunctionCreate("strfind", LibapxVariableFunctionStringFindSensitive);
+
+    LibapxCommandsGuideSetVariableFunctionEntry(
+        gv_LibapxStringFunctionPrefix+"strfindi()", 
+        "Find string1's position in string2. Not case-sensitive. <br> Example: <br> $[&strfindi(pears ears Pearson Pears!)] <br> Output: 6"
+    );
+    LibapxStringFunctionCreate("strfindi", LibapxVariableFunctionStringFindInsensitive);
+
+
+    
 }

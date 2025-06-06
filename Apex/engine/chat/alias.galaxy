@@ -135,6 +135,8 @@ string LibapxAliasSub(string msg, int player, int recursionDepth) {
 		if( 
 			!LibapxVariableWithinBraceCheck(msg, StringFind(msg, alias, c_stringNoCase))
 			&& 
+			!LibapxVarStringBracketCheck(msg, StringFind(msg, alias, c_stringNoCase))
+			&&
 			BankKeyExists( gv_LibapxPlayer[player].bankStorage, gv_LibapxBankSectionAlias, alias ) 
 		
 		) {

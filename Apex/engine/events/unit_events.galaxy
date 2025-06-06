@@ -605,5 +605,14 @@ bool LibapxUnitAbilityWasUsed(bool testConds, bool runActions) {
 	if (DataTableValueExists(true, FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0) + "_" + abilityCommand + abilityIndex + IntToString(abilityStage))){
 		LibapxChatParse(input, UnitGetOwner(EventUnit()), g, gv_LibapxPlayer[owner].spawningCount);
 	}
+	if (gv_LibapxPlayer[owner].readEvents != false){
+		if (UnitIsSelected(u,owner)) {
+			LibapxPrintText(PlayerGroupSingle(owner), StringToText("> Unit [ID: " + LibapxUnitId(u) + "] ") + LibapxUnitGetName(u) + StringToText(": \"<c val =\"FFFF00\">" + abilityCommand + "</c>\" = Index[<c val =\"FFFF00\">" + abilityIndex + "</c>]" + " AbilStage [<c val =\"FFFF00\">" + IntToString(abilityStage) + "</c>]")); // make a >event show cmd that switches on/off player's read value
+		}
+	}
 	return true;
+
 }
+	//For Later Events lol
+	// EventKeyPressed()
+	// TriggerAddEventKeyPressed()

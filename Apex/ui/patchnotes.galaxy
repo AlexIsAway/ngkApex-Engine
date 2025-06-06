@@ -23,7 +23,7 @@ struct patchNotesDesign {
     string version;
     string[200] patches; //Max patches per patch
 };
-static const int patchCount = 12; //Increase number when adding new patch
+static const int patchCount = 18; //Increase number when adding new patch
 static patchNotesDesign[gv_LibapxMaxPlayers][patchCount] patchNotes;
 
 
@@ -73,7 +73,93 @@ void LibapxUiPatchnotesInitPlayer(int player) {
     int j = 0;
 
 
+
     i = 0;
+    patchNotes[player][j].version = "2.3.7";
+    patchNotes[player][j].patches[i] =  "<c val=\"3498db\">CMD: >keypress Down Keys</c> added";
+    i+=1;patchNotes[player][j].patches[i] =  "<c val=\"3498db\">CMD: >keypress #loop [] function</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $[] String Parser can now accept spaces!</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Rel() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Length() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Unit() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Name() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Desc() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Subtitle() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Reword() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Sub() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Repeat() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Word() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Upper() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&strcmp() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&strcmpi() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&strcnt() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&strcnti() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&Actor() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&strfind() func added.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN:</c>&strfindi() func added.</c>";
+
+
+
+
+
+    i = 0;
+    j = j + 1;
+    patchNotes[player][j].version = "2.3.6";
+    patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Attachpoint Checker </c> no longer attaches beacons. ";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Attachpoint Checker </c> checker clear button added. ";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"2ecc71\">UI: Chat Log </c> locate button added. ";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG:</c> reloading your bank is now automatically done if it fails to load the first time.</c>";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: (EXPERIMENTAL)</c> String Parser \"$[]\" added .</c> Uses &variables assigned by varset and unitvarset";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: (EXPERIMENTAL)</c> String Funcs \"&Length()\" added .</c>";
+
+
+
+    i = 0;
+    j = j + 1;
+    patchNotes[player][j].version = "2.3.5";
+    patchNotes[player][j].patches[i] = "<c val=\"3498db\">ENG: actormsg guide</c> examples";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _unitvarset</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @sharevision me/them</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @neutral</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _mapvision</c> fixed!"; 
+
+
+    i = 0;
+    j = j + 1;
+    patchNotes[player][j].version = "2.3.4";
+    patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @offset</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @rotation -m</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @rotator</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @offset</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @sharevision</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @convert</c> fully functional?";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @height +/-</c> fixed!";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _mapvision</c> fixed!";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Abilities category can add abilities</c>";
+
+    i = 0;
+    j = j + 1;
+    patchNotes[player][j].version = "2.3.3";
+    patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @offset</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @rotation -m</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @convert</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @addability</c> added (use with caution)";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _helpmessages</c> now turns off keypress!";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _dataedit</c> syntax for [Entry] and [Field] now less case-sensitive!";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _mapvision</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: _playerlight </c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: !light autolight </c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @unitvar -remove </c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @abilities </c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @actrmsg -nocache </c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"00ffc3\">VAR_FN: $Alive</c> added";
+    i+=1;patchNotes[player][j].patches[i] = "<c val=\"9b59b6\">ENG: Movers added to catalog</c>";
+
+
+
+
+    i = 0;
+    j = j + 1;
     patchNotes[player][j].version = "2.3.2";
     patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: @select</c> added";
     i+=1;patchNotes[player][j].patches[i] = "<c val=\"3498db\">CMD: >event </c> added";

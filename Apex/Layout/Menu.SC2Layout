@@ -2,10 +2,34 @@
 <Desc>
 	<!-- Menu Being moved over -->
 	<Frame type="MenuBar" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBar" file="GameUI">
-		<Height val="60"/>
-		<Width val="259"/>
+		<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-295"/>
+		<Anchor side="Right" relative="$parent" pos="Min" offset="210"/>
+
+
+		<Animation name="Show">
+			<Event event="OnShown" action="Reset,Play"/>
+				 
+			<Controller type="Fade" end="Pause">
+				<Key type="Curve" time="0" value="0" out="Slow"/>
+				<Key type="Curve" time="3" value="255" in="Slow"/>
+			</Controller>
+			<Controller type="Anchor" side="Right" end="Pause" relative="true">
+				<Key type="Curve" time="0" value="0" />
+				<Key type="Curve" time="1.00" value="0" />
+				<Key type="Curve" time="1.16" value="150" />
+				<Key type="Curve" time="2.32" value="150" />
+				<Key type="Curve" time="3.36" value="150" inout="slow" />
+				<Key type="Curve" time="4.0" value="150" inout="slow" />
+			  </Controller>
+			  <Controller type="Rotation" end="Pause" frame="$parent">
+				<Key type="Curve" time="0" value="90"/>
+				<Key type="Curve" time="1" value="180"/>
+			</Controller>
+		</Animation>
+		
 		<Frame type="Image" name="MenuBarBackgroundImage">
-			<Visible val="false"/>
+			<Visible val="False"/>
 		</Frame>
 	</Frame>
 
@@ -13,8 +37,22 @@
 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/MenuBarConsoleAnchor" file="GameUI">
 		<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
 		<Anchor side="Bottom" relative="$parent" pos="Max" offset="-295"/>
-		<Anchor side="Right" relative="$parent" pos="min" offset="210"/>
+		<Anchor side="Right" relative="$parent" pos="Min" offset="300"/>
 		<Height val="60"/>
-		<Width val="200"/>
+		<Width val="259"/>
     </Frame>
+
+	<!-- <Frame type="GameUI" name="GameUI" file="GameUI">
+		<Animation name="ChatBar_Chars">
+		  <Event event="OnShown" action="Play"/>
+	  
+			<Controller type="Property" property="MaxCharacters" end="Pause" frame="$GameUI_ChatBar/ChatEditBox">
+			  <Key type="Property" time="0" value="765"/> 765 <!--- character limit -->
+			<!-- </Controller>
+		</Animation> -->
+	  <!-- </Frame> -->
+
+
+
+
 </Desc>

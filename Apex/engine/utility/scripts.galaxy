@@ -21,6 +21,14 @@ bool gv_LibapxPlayerbankHasloaded(int p) {
 	}
 	else {
 		LibapxPrintError(p,"Banks not loaded, wait until banks are loaded to use this command");
+		LibapxPrintOutput(p, "<c val=\"77aaff\">Bank Reload initlized...</c>");
+		BankReload(gv_LibapxPlayer[p].bankStorage);
+		BankWait(gv_LibapxPlayer[p].bankStorage);
+		gv_LibapxPlayer[p].aliases = LibapxSortAliases(p);
+		gv_LibapxPlayer[p].wireframes = LibapxWireframesGetAll(p);
+		LibapxPrintSuccess(p, "Bank Reload Completed");
+		LibapxChkAllAliases(p);
+		gv_LibapxPlayer[p].banksloaded = true;
 		return false;
 	}
 }

@@ -126,6 +126,8 @@ struct gv_LibapxPlayerProperties {
 
 
 	bool mouseRight;
+	bool mouseLeft;
+	bool mouseMiddle;
 
 
 	// chatMsg
@@ -225,6 +227,8 @@ struct gv_LibapxPlayerProperties {
 	// ===============
 	// map revealer for entire map (revealers player specific)
 	revealer mapRevealer;
+	bool mapSight;
+	bool revealLock;
 
 	// search_ variables
 	// ==============
@@ -297,6 +301,9 @@ struct gv_LibapxPlayerProperties {
 
 	//Help messages
 	bool helpMessages;
+
+	//Messages from ability events
+	bool readEvents;
 };
 
 // gv_LibapxPlayerParserProperties
@@ -341,6 +348,9 @@ string LibapxWireframesGetAll(int player);
 void gv_LibapxPlayerInitialize(int player) {
 	unit u;
 	gv_LibapxPlayer[player].mapRevealer = VisRevealerCreate(player, RegionEntireMap());
+	gv_LibapxPlayer[player].mapSight = true;
+	gv_LibapxPlayer[player].revealLock = false;
+	gv_LibapxPlayer[player].readEvents = false;
 	gv_LibapxPlayer[player].mousePosition = RegionGetCenter( RegionEntireMap() );
 	gv_LibapxPlayer[player].mousePositionUi = Point(0, 0);
 	gv_LibapxPlayer[player].permissionLevel = 0;

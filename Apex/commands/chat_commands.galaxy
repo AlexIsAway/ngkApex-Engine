@@ -18,7 +18,7 @@ void LibapxCommandNarrate(int user, unitgroup u, string argv, int spawningCount,
 	LibapxPrint(PlayerGroupAll(), LibapxStringTrim(msg));
 
 	// log msg in chatlog
-	LibapxLog(user, StringToText(""), msg);
+	LibapxLog(user, StringToText(""), msg, "");
 
 	return;
 }
@@ -39,6 +39,7 @@ void LibapxCommandSay(int user, unitgroup u, string argv, int spawningCount, str
 	text unitName;
 	text unitMsg;
 	string cmdMsg = argv;
+    string pos = " " + FixedToString(PointGetX(UnitGetPosition(UnitGroupUnit(u,1))), 1 ) + " " + FixedToString(PointGetY(UnitGetPosition(UnitGroupUnit(u,1))), 1 );
 	cmdMsg = " " + LibapxStringTrim(StringSub( cmdMsg, StringFind(cmdMsg, " ", c_stringCase) + 1, StringLength(cmdMsg) )); // remainder of chat message
 
 	unitMsg = StringToText(cmdMsg);
@@ -57,10 +58,10 @@ void LibapxCommandSay(int user, unitgroup u, string argv, int spawningCount, str
 		UnitFlashSelection(UnitGroupLoopCurrent(), 2.0);
 		ActorSend(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), "AttachModel " + LibapxTalkIconActor + "{} Overhead");
 
-		LibapxPrintText(PlayerGroupAll(), unitName + unitMsg);
+		LibapxPrintText(PlayerGroupAll(), unitName + StringToText("<c val=\"FFFFFF\">") + unitMsg);
 
 		// log msg in chatlog
-		LibapxLog(user, unitName, cmdMsg);
+		LibapxLog(user, unitName, cmdMsg, pos);
 
 		UnitGroupLoopStep();
 	}
@@ -157,7 +158,7 @@ void LibapxDefineRepeat(string commandName) {
 	);
 }
 
-// LibapxCommandKeypres
+// LibapxCommandKeypress
 // =======================
 // Assigns a string to a certain key for the selected unit
 // When that key and that unit(only that unit) are selected, the string parses.
@@ -167,6 +168,8 @@ void LibapxCommandKeypress(int user, unitgroup u, string argv, int spawningCount
 	int i = 1;
 	bool isKey = false;
 	keypressString = LibapxBracketTextGrab(bracketText, 1);
+
+    
 
 
 	if (StringCase(StringWord(argv, 2), c_stringNoCase) == "help") {
@@ -187,9 +190,17 @@ void LibapxCommandKeypress(int user, unitgroup u, string argv, int spawningCount
 		while(!UnitGroupLoopDone()) {
 
 			LibapxUnitSetVal(UnitGroupLoopCurrent(), StringWord(argv, 2), keypressString);
-
+            if(gv_LibapxPlayer[user].helpMessages) {
 			LibapxPrintOutput(user, "Set keypress <c val=\"d63031\">\"" + StringWord(argv, 2) + "\"</c> on unit to this text: \n <c val=\"00cec9\">"+keypressString+"</c>");
-			UnitGroupLoopStep();
+            }
+            if(StringWord(argv, 3) != "" && StringToFixed(StringWord(argv, 3)) >= 0.0005) {
+                LibapxUnitSetVal(UnitGroupLoopCurrent(), StringWord(argv, 2) + "time", StringWord(argv, 3));
+                // DebugLog(LibapxUnitGetVal(UnitGroupLoopCurrent(), StringWord(argv, 2) + "time"));
+                if(gv_LibapxPlayer[user].helpMessages) {
+                    LibapxPrintOutput(user,"Parses Per: " + StringWord(argv, 3) + " seconds");
+                }
+            }
+            UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
 	}
@@ -203,7 +214,7 @@ void LibapxDefineKeypress(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		" This command assigns commands to a key on a unit. <br> >keypress [keyname] [[commands]] <br> Possible keys are "+gv_LibapxAllKeys+" <br> Examples: <br> >keypress keyW [@position -rel +0 +3] <br> >keypress keyQ [@move;>moveto -arc 2 [boom]]; "
+		" This command assigns commands to a key on a unit. <br> >keypress [keyname] #holdrepeat [[commands]] <br> Possible keys are "+gv_LibapxAllKeys+" <br> Examples: <br> >keypress keyW 0.1 [@position -rel +0 +3] <br> >keypress keyQ [@move;>moveto -arc 2 [boom]]; "
 	);
 }
 
@@ -690,7 +701,7 @@ void LibapxCommandSet(int user, unitgroup u, string argv, int spawningCount, str
     unit tmpUnit;
     bool isEvent = false;
     bool CopyCaches = false;
-    string unitVitals;
+    string unitVitals = "";
 
 
     unitType = UnitTypeFromString(StringWord(argv,2));
@@ -702,17 +713,24 @@ void LibapxCommandSet(int user, unitgroup u, string argv, int spawningCount, str
     for (i = 1; i <= UnitGroupCount(u, c_unitCountAll); i += 1) {
         tmpUnit = UnitGroupUnit(u, i);
     }
-
+    if (StringWord(argv,3) != "-novitals" || StringWord(argv,3) != "-novitals"){
     unitVitals = ";@maxlife " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropLifeMax, c_unitPropCurrent),1) + ";@life " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropLife, c_unitPropCurrent),1) +";@liferegen " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropLifeRegen, c_unitPropCurrent),1) +";@maxenergy " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropEnergyMax, c_unitPropCurrent),1) +";@energy " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropEnergy, c_unitPropCurrent),1) +";@energyregen " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropEnergyRegen, c_unitPropCurrent),1) +";@maxshields " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropShieldsMax, c_unitPropCurrent),1) +";@shields " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropShields, c_unitPropCurrent),1) +";@shieldsregen " + FixedToString(UnitGetPropertyFixed(tmpUnit, c_unitPropShieldsRegen, c_unitPropCurrent),1) + ";";
+    }
 
     if (StringWord(argv,2) == "remove" || StringWord(argv,2) == "default" || StringWord(argv,2) == "undo" || StringWord(argv,2) == "reset" ) {    //Parameters to remove cmds from selected unit(s) aka set back to "default"
 
         UnitGroupLoopBegin(u);
         while(!UnitGroupLoopDone()) {
-
-        DataTableValueRemove(true, IntToString(UnitGetOwner(UnitGroupUnit(u, 1))) + UnitGetType(UnitGroupLoopCurrent()) + "_birth");
-        LibapxPrintOutput(user, "Removing <c val=\"d63031\"> " + UnitGetType(UnitGroupLoopCurrent()) + "'s </c>assigned >set commands.");
-        UnitGroupLoopEnd();
+            if (StringWord(argv,3) != ""){
+                DataTableValueRemove(true, IntToString(UnitGetOwner(UnitGroupUnit(u, 1))) + LibapxCatalogGet(c_gameCatalogUnit, StringWord(argv,3)) + "_birth");
+                LibapxPrintOutput(user, "Removing <c val=\"d63031\"> " + LibapxCatalogGet(c_gameCatalogUnit, StringWord(argv,3)) + "'s </c>assigned >set commands.");
+                UnitGroupLoopEnd();
+            }
+            else {                
+                DataTableValueRemove(true, IntToString(UnitGetOwner(UnitGroupUnit(u, 1))) + UnitGetType(UnitGroupLoopCurrent()) + "_birth");
+                LibapxPrintOutput(user, "Removing <c val=\"d63031\"> " + UnitGetType(UnitGroupLoopCurrent()) + "'s </c>assigned >set commands.");
+                UnitGroupLoopEnd();
+            }
 
         }
         return;
@@ -737,9 +755,9 @@ void LibapxCommandSet(int user, unitgroup u, string argv, int spawningCount, str
     }
 
 
-    //if(StringFind( eventString, "@attach",c_stringNoCase) != -1) {
-        //eventStringActual =  StringReplaceWord(eventString, "@attach", "@attach -nodelay", 0, c_stringNoCase);
-    //}
+    ///if(StringFind( eventString, "@attach",c_stringNoCase) != -1) {
+    ///    eventStringActual =  StringReplaceWord(eventString, "@attach", "@attach -nodelay", 0, c_stringNoCase);
+    ///}
 
     //In event of just typing ">set"
     if (CopyCaches == true && StringWord(argv,2) == "") {
@@ -792,9 +810,8 @@ void LibapxDefineSet(string commandName) {
     LibapxCommandsGuideEntrySet(
         gv_CommandsGuideEntryGeneral, 
         commandName, 
-        " This command assigns commands to the birth event of a unit type.  <br> >set [UnitType] [Commands] <br>  <br> <c val=\"255,229,201\">Examples</c>:  <br> >set Marine [@scale 2;@tint 0 255 0;@removeweapon -all;@addweapon C10CanisterRifle]  <br> >set [@say Reporting for duty!]; "
-    );
-}
+        " This command assigns an issued commandstring to the birth event of a specific type of unit.  <br> >set [Unit] [Commands] <br>  <br> <c val=\"255,229,201\">Examples</c>: <br> Units that are the same as the selected unit will be issued the bracket commands upon birth: <br> >set [@say Reporting for duty!]; <br> <br> Assigns a command to a unit when spawned: <br> >set Marine [@scale 2]  <br> <br> Just typing >set will set the birth event to its own unit caches: <br> >set <br> <br> To assign a different unit type's birth event with the selected unit's caches: <br> >set Zergling <br> <br> To undo or reset the >set strings for a unit type: <br> >set remove <br> >set undo <br> >set clear <br> >set reset <br> <br> To exclude >set from inheriting selected unit's vitals, type -novitals: <br> >set Marine -novitals [@scale 10]" );
+    }
 
 
 // LibapxCommandEvent
@@ -814,6 +831,30 @@ void LibapxCommandEvents(int user, unitgroup u, string argv, int spawningCount, 
     bool isValid = false;
     int i = 1;
     eventString = LibapxBracketTextGrab(bracketText, 1);
+
+    // Turning on/off live-reading of ability event stages of the unit(s) selected.
+    if(StringWord(argv, 2) == "read"){
+        if(StringWord(argv, 3) == "on") {
+            gv_LibapxPlayer[user].readEvents = true;
+            LibapxPrintOutput(user,"Ability Read: <c val=\"00FF00\">ON");
+            return;
+        } else if (StringWord(argv, 3) == "off") {
+            gv_LibapxPlayer[user].readEvents = false;
+            LibapxPrintOutput(user,"Ability Read Mode: <c val=\"FF0000\">OFF");
+            return;
+        } else if (gv_LibapxPlayer[user].readEvents == false) {
+            gv_LibapxPlayer[user].readEvents = true;
+            LibapxPrintOutput(user,"Ability Read: <c val=\"00FF00\">ON");
+            return;
+        } else {
+            gv_LibapxPlayer[user].readEvents = false;
+            LibapxPrintOutput(user,"Ability Read Mode: <c val=\"FF0000\">OFF");
+            return;
+        }
+
+    }
+    
+    
 
 
     // help list
@@ -881,8 +922,8 @@ void LibapxDefineEvents(string commandName) {
     LibapxCommandsGuideEntrySet(
         gv_CommandsGuideEntryGeneral, 
         commandName, 
-        " This command assigns commands that will parse once an event is fired from the unit. <br>  <br> >event [eventname] [[commands]] <br>  <br> >event ability [abilityID] [index] [stage] [[commands]]  <br>  <br> >event behavior [BehaviorID] [BehaviorChange] <br>  <br> >event effect [EffectID] [[commands]] <br>  <br> Events available are: <br> <c val=\"0,255,100\">"+gv_LibapxAllEvents+"</c>  <br>  <br> Possible parameters are: <c val=\"255,255,0\">Ability, Behavior, Effect</c> <br>  <br> <c val=\"255,229,201\">Examples</c>:  <br> >event attack [@position -rel +0 +3]  <br> >event move [@move;>moveto -arc 2 [boom]];  <br> >event ability move 0 -3 [@say I moved.] <br> >event behavior Stimpack 0 [@say I'M PUMPED UP] <br> >event effect GuassRifle [@say EAT LEAD] <br>  <br>  <br> <c val=\"255,229,201\">Ability Stages</c> <br> -8 = c_unitAbilStageUnpause <br> -7 = c_unitAbilStagePause <br> -6 = c_unitAbilStageComplete <br> -5 = c_unitAbilStagePreempt <br> -4 = c_unitAbilStageCancel <br> -3 = c_unitAbilStageExecute <br> -2 = c_unitAbilStageQueue <br> -1 = c_unitAbilStageAll <br>  <br> <c val=\"255,229,201\">Behavior Changes</c> <br> 0 = c_unitBehaviorChangeCreate <br> 1 = c_unitBehaviorChangeDestroy <br> 2 = c_unitBehaviorChangeRefresh <br> 3 = c_unitBehaviorChangeIncrease <br> 4 = c_unitBehaviorChangeDecrease <br> 5 = c_unitBehaviorChangeActivate <br> 6 = c_unitBehaviorChangeDeactivate"    );        
-        }
+        " This command assigns commands that will parse once an event is fired from the unit. <br> <c val=\"FFE5C9\">Main Syntax:</c> <br> >event [eventname] [[commands]] <br> <br> <c val=\"255,229,201\">Examples</c>:  <br> >event attack [@position -rel +0 +3]  <br> >event move [@move;>moveto -arc 2 [boom]];  <br> >event ability move 0 -3 [@say I moved.] <br> >event behavior Stimpack 0 [@say I'M PUMPED UP] <br> >event effect GuassRifle [@say EAT LEAD] <br>  <br> <c val=\"FFE5C9\">Read Ability Events:</c> <br> >event read (optional: on/off) <br> <br> <c val=\"FFE5C9\">Ability Syntax:</c>  <br> >event ability [AbilityName] [index] [stage] [[commands]]  <br> <c val=\"FFE5C9\">Behavior Syntax</c> <br> >event behavior [BehaviorName] [BehaviorChange]  <br> <c val=\"FFE5C9\">Effect Syntax:</c>  <br> >event effect [EffectName] [[commands]] <br>  <br> Events available are: <br> <c val=\"0,255,100\">"+gv_LibapxAllEvents+"</c>  <br> Possible Parameters are: <br> <c val=\"255,255,0\">Ability, Behavior, Effect</c>  <br> <c val=\"255,229,201\">Ability Stages</c> <br> -8 = c_unitAbilStageUnpause <br> -7 = c_unitAbilStagePause <br> -6 = c_unitAbilStageComplete <br> -5 = c_unitAbilStagePreempt <br> -4 = c_unitAbilStageCancel <br> -3 = c_unitAbilStageExecute <br> -2 = c_unitAbilStageQueue <br> -1 = c_unitAbilStageAll <br>  <br> <c val=\"255,229,201\">Behavior Changes</c> <br> 0 = c_unitBehaviorChangeCreate <br> 1 = c_unitBehaviorChangeDestroy <br> 2 = c_unitBehaviorChangeRefresh <br> 3 = c_unitBehaviorChangeIncrease <br> 4 = c_unitBehaviorChangeDecrease <br> 5 = c_unitBehaviorChangeActivate <br> 6 = c_unitBehaviorChangeDeactivate"    );        
+    }
 
 // LibapxCommandSequence
 // =======================
@@ -911,6 +952,6 @@ void LibapxDefineSequence(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryGeneral, 
 		commandName, 
-		"This command creates an individual instance of the bracket text input on each unit of the group selected. <br> <br> >foreach [@spawn marine;@label Sero is a cool dude;Ngok is okay too, I guess.]"
+		"This command creates an individual instance of the bracket text input on each unit of the group selected. <br> Examples: <br> @spawn marine 20;>sequence [@label ${$RandInt(1,10)};@scale ${$RandInt(1,3)}]"
 	);
 }

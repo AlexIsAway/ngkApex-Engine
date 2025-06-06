@@ -20,7 +20,7 @@ static bool[16] ApplyField;
 static string[16] CurrentCatagory;
 static string[16][1000] AllQueries;
 
-static string Types = "Ability Actor Behavior Effect Footprint Light Model Decal Turret Unit Upgrade Validator Weapon Sound Soundtrack";
+static string Types = "Ability Actor Behavior Effect Footprint Light Model Decal Turret Unit Upgrade Validator Weapon Sound Soundtrack Mover";
 
 void LibapxUiCatalogInit() {
 
@@ -127,6 +127,9 @@ static int FindCatalog(string type) {
 	else if(type == "soundtrack" || type == "soundtracks") {
 		catalog = c_gameCatalogSoundtrack;
     }
+	else if(type == "mover" || type == "movers") {
+		catalog = c_gameCatalogMover;
+    }
     return catalog;
 }
 
@@ -224,7 +227,7 @@ bool LibapxUiCategorySelectField(bool testConds, bool runActions) {
     ug = UnitGroupFilterPlayer(ug, p, -1);
     if(ApplyField[p]) {
         if(catalog == "Model") {
-            LibapxChatParse("@modelswap "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
+            LibapxChatParse("@modelswap "+selected+ " -nosplice;@actrmsg PhysicsTerminate -nocache", p, ug, gv_LibapxPlayer[p].spawningCount);
         }
         if(catalog == "Light") {
             LibapxChatParse("!light "+selected + " .2", p, ug, gv_LibapxPlayer[p].spawningCount);
@@ -239,7 +242,7 @@ bool LibapxUiCategorySelectField(bool testConds, bool runActions) {
             LibapxChatParse("_upgrade "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
         }
         if(catalog == "Sound") {
-            LibapxChatParse("@actrmsg Destroy Sound;@actrmsg Create Sound "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
+            LibapxChatParse("@actrmsg ->Sound Destroy -nocache;@actrmsg Create Sound "+selected+ " -nocache", p, ug, gv_LibapxPlayer[p].spawningCount);
         }
         if(catalog == "Weapon") {
             LibapxChatParse("@removeweapon -all;@addweapon "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
@@ -252,6 +255,14 @@ bool LibapxUiCategorySelectField(bool testConds, bool runActions) {
         }
         if(catalog == "Behavior") {
             LibapxChatParse("@addbehavior "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
+        }
+        if(catalog == "Mover") {
+            LibapxChatParse("_print "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
+        }
+        if(catalog == "Ability") {
+            LibapxChatParse("_print "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
+            LibapxChatParse("@addability "+selected, p, ug, gv_LibapxPlayer[p].spawningCount);
+
         }
     }
 

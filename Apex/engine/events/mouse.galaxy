@@ -42,6 +42,7 @@ bool LibapxMouseMoved(bool testConds, bool runActions) {
 // If player is using mouse-click spawning, creates a copy of the spawn splat
 // at the location in the world that was clicked on
 bool LibapxMouseLeftCLickedDown(bool testConds, bool runActions) {
+	int user = EventPlayer();
 	gv_LibapxPlayer[EventPlayer()].mousePosition = Point(EventMouseClickedPosXWorld(), EventMouseClickedPosYWorld());
 
 	if( gv_LibapxPlayer[EventPlayer()].isPlacingUnit ) {
@@ -53,6 +54,23 @@ bool LibapxMouseLeftCLickedDown(bool testConds, bool runActions) {
 						  );
 	}
 
+        gv_LibapxPlayer[user].mouseLeft = true;
+        LibapxUnitKeypressCheck("key_mouseLeft",gv_LibapxPlayer[user].mouseLeft);
+        while(gv_LibapxPlayer[user].mouseLeft == true && KeypressTimerCheck("key_mouseLeft")){
+            Wait(KeypressTimer("key_mouseLeft"),c_timeGame);
+            if(gv_LibapxPlayer[user].mouseLeft == true){
+            LibapxUnitKeypressCheck("key_mouseLeft",gv_LibapxPlayer[user].mouseLeft);
+            }
+        }
+
+	return true;
+}
+bool LibapxMouseLeftCLickedUp(bool testConds, bool runActions) {
+	int user = EventPlayer();
+	gv_LibapxPlayer[user].mouseLeft = false;
+
+	LibapxUnitKeypressUpCheck("keyUp_mouseLeft");
+
 	return true;
 }
 
@@ -60,10 +78,54 @@ bool LibapxMouseLeftCLickedDown(bool testConds, bool runActions) {
 // =======================
 // toggles player right mouse button down/up flag
 bool LibapxMouseRightClickedDown(bool testConds, bool runActions) {
+	int user = EventPlayer();
+
 	gv_LibapxPlayer[EventPlayer()].mouseRight = true;
+
+	LibapxUnitKeypressCheck("key_mouseRight",gv_LibapxPlayer[user].mouseRight);
+	while(gv_LibapxPlayer[user].mouseRight == true && KeypressTimerCheck("key_mouseRight")){
+		Wait(KeypressTimer("key_mouseRight"),c_timeGame);
+		if(gv_LibapxPlayer[user].mouseRight == true){
+		LibapxUnitKeypressCheck("key_mouseRight",gv_LibapxPlayer[user].mouseRight);
+		}
+	}
+
 	return true;
 }
 bool LibapxMouseRightClickedUp(bool testConds, bool runActions) {
+	int user = EventPlayer();
+
+	LibapxUnitKeypressUpCheck("keyUp_mouseRight");
+
 	gv_LibapxPlayer[EventPlayer()].mouseRight = false;
+	return true;
+}
+
+
+// librtprMouseMiddleClicked_
+// =======================
+// toggles player middle mouse button down/up flag
+bool LibapxMouseMiddleClickedDown(bool testConds, bool runActions) {
+	int user = EventPlayer();
+
+	gv_LibapxPlayer[EventPlayer()].mouseMiddle = true;
+
+	LibapxUnitKeypressCheck("key_mouseMiddle",gv_LibapxPlayer[user].mouseMiddle);
+	while(gv_LibapxPlayer[user].mouseMiddle == true && KeypressTimerCheck("key_mouseMiddle")){
+		Wait(KeypressTimer("key_mouseMiddle"),c_timeGame);
+		if(gv_LibapxPlayer[user].mouseMiddle == true){
+		LibapxUnitKeypressCheck("key_mouseMiddle",gv_LibapxPlayer[user].mouseMiddle);
+		}
+	}
+
+	return true;
+}
+
+bool LibapxMouseMiddleClickedUp(bool testConds, bool runActions) {
+	int user = EventPlayer();
+
+	LibapxUnitKeypressUpCheck("keyUp_mouseMiddle");
+
+	gv_LibapxPlayer[EventPlayer()].mouseMiddle = false;
 	return true;
 }

@@ -39,6 +39,9 @@ struct wireframeLayerSig {
 	int height;
 	int rotation;
 	int alpha;
+    int hSkew;
+    int vSkew;
+    int Glow;
 };
 wireframeLayerSig gv_DefaultWireframe;
 string gv_DefaultWireframeString = "defaultWireframeX1235asdAZSw";
@@ -263,6 +266,8 @@ void LibapxGuidePresetDescriptions() {
 //-----------------------------
 const int gv_LibapxVariableFunctionPrecision = 4;
 const string gv_LibapxVariableFunctionPrefix = "$";
+const string gv_LibapxStringFunctionPrefix = "&";
+
 
 void LibapxCommandsGuideSetVariableFunctionEntry(string title, string body) {
     LibapxCommandsGuideEntrySet(

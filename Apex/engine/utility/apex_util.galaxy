@@ -423,3 +423,96 @@ string LibapxUtilsInfixEvaluator(string s) {
 
 	return LibapxUtilsStackPop(operandStack);
 }
+
+
+
+// Ngokerz's String Parser Evaluator
+string LibapxUtilsInfixStringEvaluator(string s) {
+	int operandStack = LibapxUtilsCreateStack();
+	int operatorStack = LibapxUtilsCreateStack();
+	int i = 1;
+	int j = 1;
+	int step = 1;
+	string currentChar;
+	string nextChar;
+	int currentPrecedence;
+	int topPrecedence;
+	string stackDebugger = "";
+	s = "("+CleanStringOfNoneOperandsAndOperators(s)+")";
+
+
+	for (i = 1; StringSub(s, i, i) != ""; i += step) {
+		currentChar = StringSub(s, i, i);
+		//Get number, otherwise return operator
+		step = 1;
+
+		j = i + 1;
+		//If it's a number, get all operands following it until interrupted by operator
+		// if(LibapxUtilsIsOperand(currentChar)) {
+		// 	while(true) {
+		// 		nextChar = StringSub(s, j, j);
+		// 		if(LibapxUtilsIsOperand(nextChar)) {
+		// 			currentChar += nextChar;
+		// 			j += 1;
+		// 			step += 1;
+		// 		}
+		// 		else {
+		// 			break;
+		// 		}
+		// 	}
+		// }
+
+
+		// stackDebugger += "Token("+currentChar+")";
+		// if(LibapxUtilsIsOperand(currentChar)) {
+			
+			// stackDebugger += " Action(Push to Operand Stack)";
+			//If the character is an operand, push to the operand stack
+			// LibapxUtilsStackPush(operandStack, currentChar);
+		// }
+		// else if(LibapxUtilsIsOperator(currentChar)) {
+		// 	//If operator is empty, push to operator stack
+		// 	if(LibapxUtilsIsStackEmpty(operatorStack)) {
+				
+		// 		// stackDebugger += " Action(Push to Operator Stack)";
+		// 		LibapxUtilsStackPush(operatorStack, currentChar);
+		// 	}
+		// 	else {
+		// 		currentPrecedence = GetPrecedence(currentChar);
+		// 		topPrecedence = GetPrecedence(LibapxUtilsStackGetTop(operatorStack));
+		// 		if(currentPrecedence >= topPrecedence) {
+					
+		// 			// stackDebugger += " Action(Push to Operator Stack)";
+		// 			LibapxUtilsStackPush(operatorStack, currentChar);
+		// 		}
+		// 		else {
+		// 			// stackDebugger += " Action(PROCESS STARTED1)\n";
+		// 			//Do some process
+		// 			ProcessForLowerPrecendence(operandStack, operatorStack);
+		// 			LibapxUtilsStackPush(operatorStack, currentChar);
+		// 		}
+		// 	}
+
+
+		// }
+		 if(currentChar == "(") {
+			LibapxUtilsStackPush(operatorStack, currentChar);
+			
+			// stackDebugger += " Action(Push to Operator Stack)";
+		}
+		else if(currentChar == ")") {
+			// stackDebugger += " Action(PROCESS STARTED2)\n";
+			//Do some process
+			if(!ProcessForLowerPrecendence(operandStack, operatorStack)) {
+				return LibapxUtilsStackPop(operandStack);
+			};
+		}
+		stackDebugger = "";
+	}
+
+
+	// LibapxUtilsStackPush(operatorStack);
+	// DebugLog("Operand Stack : [" + gv_LibapxStacks[operandStack] + "]");
+
+	return LibapxUtilsStackPop(operandStack);
+}

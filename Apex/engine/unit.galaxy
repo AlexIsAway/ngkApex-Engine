@@ -10,7 +10,7 @@ static const string UnitNameDataTableIdentifier = ".NAME";
 static const string UnitNameColorDataTableIdentifier = ".NAMECOLOR";
 
 static const int UnitCacheMaAxString = 500;
-static const int UnitCacheOverwriteCheckLimit = 10;
+static const int UnitCacheOverwriteCheckLimit = 12; // I changed this from 10 to 11 because idk wtf was causing @offset not to save.
 static const int UnitCacheLimit = -1;
 
 // Unit custom value indexes:
@@ -24,7 +24,9 @@ const int gv_LibapxUnitIndexFlagAnimspeed = 6;	// flag for @animspeed has been u
 const int gv_LibapxUnitIndexFlagPlay = 7;			// flag for @play has been used
 const int gv_LibapxUnitIndexFlagStatbars = 8;		// flag for @statbars has been used
 const int gv_LibapxUnitIndexFlagRotate = 9;		// flag for @rotate has been used
-const int gv_LibapxUnitIndexFlagDecal = 10;		// flag for @rotate has been used
+const int gv_LibapxUnitIndexFlagDecal = 10;		// flag for @decal has been used
+const int gv_LibapxUnitIndexFlagOffset = 11;		// flag for @offset has been used
+const int gv_LibapxUnitIndexFlagRotator = 12;		// flag for @offset has been used
 
 
 const int gv_LibapxUnitIndexWaygate = 15;			// region ID for waygates
@@ -86,11 +88,11 @@ string LibapxUnitGetVal(unit u, string valuename) {
 
 }
 
-const string gv_LibapxAllKeys = "key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numpad5 key_numpad6 key_numpad7 key_numpad8 key_numpad9 key_numbpadplus key_numbpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
+const string gv_LibapxAllKeys = "key_mouseMiddle keyUp_mouseMiddle key_mouseRight key_mouseLeft keyUp_mouseRight keyUp_mouseLeft key_esc keyUp_esc keyUp_control keyUp_alt keyUp_tab keyUp_shift keyUp_grave keyUp_0 keyUp_1 keyUp_2 keyUp_3 keyUp_4 keyUp_5 keyUp_6 keyUp_7 keyUp_8 keyUp_9 keyUp_a keyUp_b keyUp_c keyUp_d keyUp_e keyUp_f keyUp_g keyUp_h keyUp_i keyUp_j keyUp_k keyUp_l keyUp_m keyUp_n keyUp_o keyUp_p keyUp_q keyUp_r keyUp_s keyUp_t keyUp_u keyUp_v keyUp_w keyUp_x keyUp_y keyUp_z keyUp_up keyUp_down keyUp_left keyUp_right keyUp_pgup keyUp_pgdown keyUp_numpad0 keyUp_numpad1 keyUp_numpad2 keyUp_numpad3 keyUp_numpad4 keyUp_numpad5 keyUp_numpad6 keyUp_numpad7 keyUp_numpad8 keyUp_numpad9 keyUp_numbpadplus keyUp_numbpadminus keyUp_numpadmultiply keyUp_numpaddivide keyUp_numpaddecimal keyUp_grave key_control key_alt key_tab key_shift key_grave key_0 key_1 key_2 key_3 key_4 key_5 key_6 key_7 key_8 key_9 key_a key_b key_c key_d key_e key_f key_g key_h key_i key_j key_k key_l key_m key_n key_o key_p key_q key_r key_s key_t key_u key_v key_w key_x key_y key_z key_up key_down key_left key_right key_pgup key_pgdown key_numpad0 key_numpad1 key_numpad2 key_numpad3 key_numpad4 key_numpad5 key_numpad6 key_numpad7 key_numpad8 key_numpad9 key_numbpadplus key_numbpadminus key_numpadmultiply key_numpaddivide key_numpaddecimal key_grave";
 
 // LibapxUnitSetVal
 // ===========================
-// Gets a custom value stored to the unit.
+// Sets a custom value stored to the unit.
 void LibapxUnitSetVal(unit u, string valuename, string value) {
 	string unitId;
 	string key;
@@ -98,6 +100,9 @@ void LibapxUnitSetVal(unit u, string valuename, string value) {
 	string comparison;
 	unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
 	i = 1;
+	if(StringContains(valuename,"time",c_stringAnywhere,c_stringNoCase)){
+		DataTableSetString(true, unitId + "_" + valuename, value);
+	}
 	while(StringWord(gv_LibapxAllKeys, i) != "") {
 		comparison = StringWord(gv_LibapxAllKeys, i);
 		if(comparison == valuename) {
@@ -108,6 +113,69 @@ void LibapxUnitSetVal(unit u, string valuename, string value) {
 	DataTableSetString(true, key, value);
 	return;
 }
+
+
+// LibapxUnitGetLastAttachVal
+// ===========================
+// Gets the last attach coordinate values stored to the unit.
+// Used for @rotator cmd
+string LibapxUnitGetLastAttachVal(unit u) {
+	string unitId;
+	string attachPrefix = "_LibapxLastAttach";
+	unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+
+	unitId =  unitId + attachPrefix;
+	return DataTableGetString(true, unitId);
+}
+// LibapxUnitGetLastTargetVal
+// ===========================
+// Gets the last attach coordinate values stored to the unit.
+// Used for @rotator cmd
+string LibapxUnitGetLastTargetVal(unit u) {
+	string targetScope;
+	string targetPrefix = "_LibapxLastTarget";
+	targetScope = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+
+	targetScope =  targetScope + targetPrefix;
+	return DataTableGetString(true, targetScope);
+}
+
+// LibapxUnitSetLastAttachVal
+// ===========================
+// Takes the unit, asks for coordinates eg. LibapxUnitSetLastAttachVal (UnitGroupLoopCurrent(), "Weapon", "01", "0.5 1.5 .3", "0,-1,1", "SOpShadow") 
+// Stores the last @attach/@attach-/@offset coordinates values to a unit
+// Only one instance per unit. Made for Ngo's @rotator concept command.
+// Previous attach coordinates are copied & reused to attach the first Apex_Attach actor
+void LibapxUnitSetLastAttachVal(unit u, string target, string attachpoint, string number, string offset, string rotations, string SOp ) {
+	string unitId;
+	string targetScope;
+	string key;
+	int i;
+	string coordinates;
+	string attachPrefix = "_LibapxLastAttach";
+	string targetPrefix = "_LibapxLastTarget";
+
+	unitId = FixedToString(UnitGetCustomValue(u, gv_LibapxUnitIndexId), 0);
+	targetScope = unitId;
+	unitId =  unitId + attachPrefix;
+	targetScope = targetScope + targetPrefix;
+	if (number == ""){
+		number = "0";
+	}
+	coordinates = " {" + attachpoint + " " + number + "} " + offset + " " + rotations + " {" + SOp + "}";
+
+	DataTableSetString(true, unitId, coordinates);
+	DataTableSetString(true, targetScope, target);
+	// LibapxPrintOutput(1, unitId + " " + StringReplaceWord(StringWord(coordinates,1),"{","",1,c_stringNoCase));
+
+	// LibapxPrintOutput(1, unitId + " " + target + coordinates);
+	// LibapxPrintOutput(1, LibapxUnitGetLastAttachVal(u));
+	// LibapxPrintOutput(1, targetScope + " " + LibapxUnitGetLastTargetVal(u));
+
+	return;
+}
+
+
 
 const string gv_LibapxAllEvents = "attack attacked attackmove attackmoveFinish attackmoveCancel highlightOn highlightOff hold holdFinish holdCancel scanmove scanmoveComplete scanmoveCancel turn turnFinish turnCancel death move moveCancel moveFinish patrol patrolAllStages patrolCancel click select unselect acquire idle stop life shields energy kill exp height level movement";
 
@@ -838,6 +906,8 @@ void LibapxUnitCacheUpdate(unit subject, string command, string userCommand) {
 		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagStatbars, 0); //"reset" statbars
 		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotate, 0); //"reset" rotate
 		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagDecal, 0); //"reset" rotate
+		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagOffset, 0);
+		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotator, 0);
 		return;
 	}
 	else if(command == "@attach-") {
@@ -850,6 +920,8 @@ void LibapxUnitCacheUpdate(unit subject, string command, string userCommand) {
 		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagStatbars, 0); //"reset" statbars
 		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotate, 0); //"reset" rotate
 		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagDecal, 0); //"reset" rotate
+		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagOffset, 0);
+		UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotator, 0);
 		return;
 	}
 
@@ -930,10 +1002,34 @@ void LibapxUnitCacheUpdate(unit subject, string command, string userCommand) {
 			return;
 		}
 	}
-	else if(command == "@decal") {
-		if(UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagRotate) != 1) {
+	else if(command == "@offset") {
+		if(UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagOffset) != 1) {
 			LibapxUnitCacheUpdateAdd(subject, unitId, userCommand);
-			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotate, 1);
+			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagOffset, 1);
+			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotator, 0);
+			return;
+		}
+		else {
+			LibapxUnitCacheUpdateOverwrite(subject, unitId, command, userCommand);
+			return;
+		}
+	}
+	else if(command == "@rotator") {
+		if(UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagRotator) != 1) {
+			LibapxUnitCacheUpdateAdd(subject, unitId, userCommand);
+			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagRotator, 1);
+			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagOffset, 0);
+			return;
+		}
+		else {
+			LibapxUnitCacheUpdateOverwrite(subject, unitId, command, userCommand);
+			return;
+		}
+	}
+	else if(command == "@decal") {
+		if(UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagDecal) != 3) {
+			LibapxUnitCacheUpdateAdd(subject, unitId, userCommand);
+			UnitSetCustomValue(subject, gv_LibapxUnitIndexFlagDecal, UnitGetCustomValue(subject, gv_LibapxUnitIndexFlagDecal) + 1);
 			return;
 		}
 		else {
@@ -949,7 +1045,8 @@ void LibapxUnitCacheUpdate(unit subject, string command, string userCommand) {
 			 command == "@removeweapon" ||
 			 command == "@effect" ||
 			 command == "@state" ||
-			 command == "@target"
+			 command == "@target" ||
+			 command == "@addability"
 			 ) {
 		LibapxUnitCacheUpdateAdd(subject, unitId, userCommand);
 		return;
@@ -1071,6 +1168,8 @@ void LibapxUnitCacheSet(unit u, string cache) {
 	UnitSetCustomValue(u, gv_LibapxUnitIndexFlagStatbars, 0); //"reset" statbars
 	UnitSetCustomValue(u, gv_LibapxUnitIndexFlagRotate, 0); //"reset" rotate
 	UnitSetCustomValue(u, gv_LibapxUnitIndexFlagDecal, 0); //"reset" rotate
+	UnitSetCustomValue(u, gv_LibapxUnitIndexFlagOffset, 0); //"reset" offset
+	UnitSetCustomValue(u, gv_LibapxUnitIndexFlagRotator, 0); //"reset" offset
 
 	///Removed for now:tm:
 	UnitSetCustomValue(u, gv_LibapxUnitIndexCacheCount, 1);
@@ -1093,7 +1192,7 @@ void LibapxUnitCacheAdd(unit u, string cache) {
 	LibapxUnitCacheUpdateAdd(u, unitId, cache);
 }
 
-void LibapxUnitKeypressCheck() {
+void LibapxUnitKeypressCheck(string key, bool userbool) {
 	int i;
 	unitgroup target;
 	unitgroup g;
@@ -1126,238 +1225,157 @@ void LibapxUnitKeypressCheck() {
 	if(	player != UnitGetOwner(u) ) {
 		return;
 	}
-	if(gv_LibapxPlayer[player].key_0 == true ) {
-		input = LibapxUnitGetVal(u, "key_0");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_1 == true ) {
-		input = LibapxUnitGetVal(u, "key_1");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_2 == true ) {
-		input = LibapxUnitGetVal(u, "key_2");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_3 == true ) {
-		input = LibapxUnitGetVal(u, "key_3");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_4 == true ) {
-		input = LibapxUnitGetVal(u, "key_4");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_5 == true ) {
-		input = LibapxUnitGetVal(u, "key_5");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_6 == true ) {
-		input = LibapxUnitGetVal(u, "key_6");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_7 == true ) {
-		input = LibapxUnitGetVal(u, "key_7");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_8 == true ) {
-		input = LibapxUnitGetVal(u, "key_8");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].key_9 == true ) {
-		input = LibapxUnitGetVal(u, "key_9");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyA == true ) {
-		input = LibapxUnitGetVal(u, "key_a");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyB == true ) {
-		input = LibapxUnitGetVal(u, "key_b");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyC == true ) {
-		input = LibapxUnitGetVal(u, "key_c");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyD == true ) {
-		input = LibapxUnitGetVal(u, "key_d");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyE == true ) {
-		input = LibapxUnitGetVal(u, "key_e");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyF == true ) {
-		input = LibapxUnitGetVal(u, "key_f");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyG == true ) {
-		input = LibapxUnitGetVal(u, "key_g");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyH == true ) {
-		input = LibapxUnitGetVal(u, "key_h");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyI == true ) {
-		input = LibapxUnitGetVal(u, "key_i");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyJ == true ) {
-		input = LibapxUnitGetVal(u, "key_j");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyK == true ) {
-		input = LibapxUnitGetVal(u, "key_k");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyL == true ) {
-		input = LibapxUnitGetVal(u, "key_l");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyM == true ) {
-		input = LibapxUnitGetVal(u, "key_m");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyN == true ) {
-		input = LibapxUnitGetVal(u, "key_n");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyO == true ) {
-		input = LibapxUnitGetVal(u, "key_o");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyP == true ) {
-		input = LibapxUnitGetVal(u, "key_p");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyQ == true ) {
-		input = LibapxUnitGetVal(u, "key_q");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyR == true ) {
-		input = LibapxUnitGetVal(u, "key_r");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyS == true ) {
-		input = LibapxUnitGetVal(u, "key_s");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyT == true ) {
-		input = LibapxUnitGetVal(u, "key_t");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyU == true ) {
-		input = LibapxUnitGetVal(u, "key_u");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyV == true ) {
-		input = LibapxUnitGetVal(u, "key_v");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyW == true ) {
-		input = LibapxUnitGetVal(u, "key_w");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyX == true ) {
-		input = LibapxUnitGetVal(u, "key_x");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyY == true ) {
-		input = LibapxUnitGetVal(u, "key_y");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyZ == true ) {
-		input = LibapxUnitGetVal(u, "key_z");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyUp == true ) {
-		input = LibapxUnitGetVal(u, "key_up");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyDown == true ) {
-		input = LibapxUnitGetVal(u, "key_down");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyLeft == true ) {
-		input = LibapxUnitGetVal(u, "key_left");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyRight == true ) {
-		input = LibapxUnitGetVal(u, "key_right");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyPgUp == true ) {
-		input = LibapxUnitGetVal(u, "key_pgup");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyPgDown == true ) {
-		input = LibapxUnitGetVal(u, "key_pgdown");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad0 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad0");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad1 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad1");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad2 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad2");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad3 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad3");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad4 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad4");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad5 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad5");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad6 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad6");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad7 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad7");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad8 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad8");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPad9 == true ) {
-		input = LibapxUnitGetVal(u, "key_numpad9");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPadPlus == true ) {
-		input = LibapxUnitGetVal(u, "key_numpadplus");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPadMinus == true ) {
-		input = LibapxUnitGetVal(u, "key_numpadminus");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPadMultiply == true ) {
-		input = LibapxUnitGetVal(u, "key_numpadmultiply");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPadDivide == true ) {
-		input = LibapxUnitGetVal(u, "key_numpaddivide");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyNumPadDecimal == true ) {
-		input = LibapxUnitGetVal(u, "key_numpaddecimal");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
-	if(gv_LibapxPlayer[player].keyGrave == true ) {
-		input = LibapxUnitGetVal(u, "key_grave");
-		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
-	}
+	
+	
+	input = LibapxUnitGetVal(u, key);
+	LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
+	// while(userbool == true){
+	// 	UnitGroupLoopBegin(g);
+	// 	while(!UnitGroupLoopDone()) {
+	// 		Wait(StringToFixed(LibapxUnitGetVal(UnitGroupUnit(g,1), key + "time")),c_timeGame);
+	// 		DebugLog(TextToString(LibapxUnitGetName(UnitGroupUnit(g,1))));
+	// 		LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
+	// 	UnitGroupLoopStep();
+	// }
+	// UnitGroupLoopEnd();
+	// }
+
 	return;
 }
 
+fixed KeypressTimer(string key) {
+	int i;
+	unitgroup target;
+	unitgroup g;
+	unit u;
+	int player;
+	string input;
+
+	player = EventPlayer();
+
+	target = UnitGroupSelected(player);
+
+	g = target;
+
+
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		i = i + 1;
+		u = UnitGroupLoopCurrent();
+
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	if(i > 1) {
+		return 1.0;
+	}
+	if(	player != UnitGetOwner(u) ) {
+		return 1.0;
+	}
+
+    return StringToFixed(LibapxUnitGetVal(u, key + "time"));
+}
+
+bool KeypressTimerCheck(string key) {
+	int i;
+	unitgroup target;
+	unitgroup g;
+	unit u;
+	int player;
+	string input;
+
+	player = EventPlayer();
+
+	target = UnitGroupSelected(player);
+
+	g = target;
+
+
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		i = i + 1;
+		u = UnitGroupLoopCurrent();
+
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	if(i > 1) {
+		return false;
+	}
+	if(	player != UnitGetOwner(u) ) {
+		return false;
+	}
+
+	if (LibapxUnitGetVal(u, key + "time") != ""){
+		return true;
+	}
+
+    return false;
+}
+
+// New plan, change the LibapxUnitKeypressUpCheck() params so that it accepts the key of choice here
+//so that it follows the same rules as keyDown 
+void LibapxUnitKeypressUpCheck(string key) {
+	int i;
+	unitgroup target;
+	unitgroup g;
+	unit u;
+	int player;
+	string input;
+	
+	player = EventPlayer();
+
+
+	target = UnitGroupSelected(player);
+	//target = LibapxEnforceUnitPermissions(target, player);
+
+
+	g = target;
+
+
+
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		i = i + 1;
+		u = UnitGroupLoopCurrent();
+
+
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+	if(i > 1) {
+		return;
+	}
+	if(	player != UnitGetOwner(u) ) {
+		return;
+	}
+
+	
+        input = LibapxUnitGetVal(u, key);
+		
+        LibapxChatParse(input, player, g, gv_LibapxPlayer[player].spawningCount);
+
+	
+
+ 
+
+	return;
+}
+
+
+
+// void LibapxUnitKeypressTimeCheck(string key) {
+// 	string keytime;
+// 	LibapxUnitKeypressCheck(key);
+// 	while(gv_LibapxPlayer[EventPlayer()].keyCtrl == true){
+// 		Wait(StringToFixed(LibapxUnitGetVal(EventUnit(), key)),c_timeGame);
+// 		LibapxUnitKeypressCheck(key);
+// 	}
+
+
+// 	return;
+// }

@@ -89,3 +89,40 @@ string LibapxCatalogGet(int catalog, string word) {
 
 	return null;
 }
+
+// librtprFieldGet
+// ====================
+// takes the given field and finds it in the entry of a catalog.
+// if it is not in the entry, returns null.
+string LibapxFieldGet(int catalog, string entry, string field) {
+	int i;
+	string test;
+
+	
+
+	if(CatalogFieldExists(CatalogEntryScope(catalog, entry), field)) {
+		return field;
+	}
+
+	i = CatalogFieldCount(CatalogEntryScope(catalog, entry));
+	while(i > 0) {
+		test = CatalogFieldGet(CatalogEntryScope(catalog, entry), i);
+		if(StringEqual(test, field, c_stringNoCase)) {
+			return test;
+		}
+		i -= 1;
+	}
+
+	i = CatalogFieldCount(CatalogEntryScope(catalog, entry));
+	while(i > 0) {
+		test = CatalogFieldGet(CatalogEntryScope(catalog, entry), i);
+		if(StringContains(test, field, c_stringBegin, c_stringNoCase)) {
+			return test;
+		}
+		i -= 1;
+	}
+
+	return null;
+}
+
+

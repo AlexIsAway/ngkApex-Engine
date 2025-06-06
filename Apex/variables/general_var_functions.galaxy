@@ -29,6 +29,65 @@ string LibapxVariableFunctionWorldHeight(int p, unitgroup u, string argv) {
     return FixedToString( WorldHeight(heightType, target), 6 );
 }
 
+// Finds if unit is dead or alive. Return 0 if dead 1 if alive.
+string LibapxVariableFunctionAlive(int p, unitgroup u, string argv) {
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        return "0";
+    }
+
+    return "1";
+
+
+}
+
+// Gets Unit ID
+string LibapxVariableFunctionUnitID(int p, unitgroup u, string argv) {
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxPrintError(p, "UnitID() can only be used with at least one unit selected");
+        return "0";
+    }
+
+    return FixedToString(UnitGetCustomValue(UnitGroupUnit(u,1), gv_LibapxUnitIndexId), 0);
+
+
+}
+
+
+
+//Gets Unit's Behavior Count Number
+string LibapxVariableFunctionUnitBehaviorCount(int p, unitgroup u, string argv) {
+    string result;
+
+    result = IntToString(UnitBehaviorCount(UnitGroupUnit(u, 1),StringWord(argv, 1)));
+
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxPrintError(p, "BehaviorCount() can only be used with at least one unit selected");
+        return "0";
+    }
+
+    return result;
+    
+}
+
+
+//Get Current Minerals
+string LibapxVariableFunctionGetResources(int p, unitgroup u, string argv) {
+    string amount;
+	int resource = StringToInt(StringWord(argv,1));
+
+    amount = IntToString(PlayerGetPropertyInt(p,resource));
+	
+
+    return amount;
+}
+
+
+
+
+
 const string gv_LibapxAvailableUnitProps = "MovementSpeed(1), Armor(2), Life(3), LifeRegen(4), MaxLife(5), Shields(6), ShieldsArmor(7), ShieldsRegen(8), MaxShields(9), Energy(10), EnergyRegen(11), MaxEnergy(12), Height(13), Kills(14), KillsXp(15), Level(16), Speed(17), CurrentSpeed(18), Acceleration(19), Turnrate(20), Radius(21) Experience(22) LifePercent(23) EnergyPercent (24) ShieldsPercent (25)";
 //Gets UnitAttribute
 string LibapxVariableFunctionUnitAttribute(int p, unitgroup u, string argv) {
@@ -142,6 +201,160 @@ string LibapxVariableFunctionUnitPlayerNumber(int p, unitgroup u, string argv) {
     
 }
 
+//Gets Unit Count
+string LibapxVariableFunctionUnitCount(int p, unitgroup u, string argv) {
+
+    return IntToString(UnitGroupCount(u, c_unitCountAlive));
+}
+
+
+//Gets UnitFacing
+string LibapxVariableFunctionUnitFacing(int p, unitgroup u, string argv) {
+    fixed facing = UnitGetFacing(UnitGroupUnit(u, 1));
+
+    if (UnitGroupCount(u, c_unitCountAlive) < 1) {
+        LibapxPrintError(p, "UnitFacing can only be used with at least one unit selected");
+        return "0";
+    }
+
+    if (facing < 0) {
+        facing = facing + 360 ;
+    }
+
+    return FixedToString(facing,6);
+}
+
+string LibapxVariableFunctionRelX(int p, unitgroup u, string argv) {
+	fixed x;
+	fixed y;
+	int shifterX = 1; // 0 is subtract, 2 is add.
+	int shifterY = 1;
+	int i;
+	point UnitPos;
+	unitgroup g = u;
+	fixed uX;
+	fixed uY;
+	fixed x2;
+	fixed facing;
+	fixed y2;
+	bool relative = true;
+	fixed polarDistance;
+	fixed polarFacingX;
+	fixed polarFacingY;
+	fixed polarFacing;
+	fixed leg1;
+	fixed leg2;
+
+
+	relative = true;
+
+    if(StringWord( argv, 1) == "") { //display unit coords
+        UnitGroupLoopBegin(g);
+        while(!UnitGroupLoopDone())
+        {
+            return UnitGetType(UnitGroupLoopCurrent()) + " (" + FixedToString(PointGetX(UnitGetPosition(UnitGroupLoopCurrent())),2) + "," + FixedToString(PointGetY(UnitGetPosition(UnitGroupLoopCurrent())),2)  + ")";
+            UnitGroupLoopStep();
+        }
+        UnitGroupLoopEnd();
+        return "";
+    }
+
+    if(StringWord( argv, 2) == "") {
+        return "requires both an X and Y for coordinates (X,Y)";
+    }
+
+
+
+
+
+    if (StringFind(StringWord(argv, 1), "+", c_stringNoCase) != -1 ) {
+        shifterX = 2;
+        i = StringFind(StringWord(argv, 1), "+", c_stringNoCase);
+        x = StringToFixed(StringReplace(StringWord(argv, 1), "", i, i));
+    }
+    else if (StringFind(StringWord(argv, 1), "-", c_stringNoCase) != -1 ) {
+        shifterX = 0;
+        i = StringFind(StringWord(argv, 1), "-", c_stringNoCase);
+        x = StringToFixed(StringReplace(StringWord(argv, 1), "", i, i));
+    }
+    else {
+        shifterX= 1;
+        x = StringToFixed(StringWord(argv, 1));
+    }
+
+
+
+
+    // y Stuff
+    // + or - found, isolating
+    if (StringFind(StringWord(argv, 2), "+", c_stringNoCase) != -1 ) {
+        //It's a +
+        shifterY = 2;
+        //Now remove the +
+        i = StringFind(StringWord(argv, 2), "+", c_stringNoCase);
+        y = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+    }
+    else if (StringFind(StringWord(argv, 2), "-", c_stringNoCase) != -1 ) {
+        //It's a -
+        shifterY = 0;
+        //Now remove the -
+        i = StringFind(StringWord(argv, 2), "-", c_stringNoCase);
+        y = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+    }
+    else {
+        shifterY = 1;
+        y = StringToFixed(StringWord(argv, 2));y = StringToFixed(StringWord(argv, 2));
+    }
+
+	// This wont work
+	if(relative) {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			// DebugLog(FixedToString(UnitGetFacing(UnitGroupLoopCurrent()),3));
+			UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+			uX = PointGetX(UnitPos);
+			uY = PointGetY(UnitPos);
+			facing = UnitGetFacing(UnitGroupLoopCurrent());
+			polarDistance = x;
+
+			if (shifterX == 2) {
+				polarFacingX = 90 + facing;
+			}
+			else if (shifterX == 0) {
+				polarFacingX = 270 + facing;
+			}
+			else {
+				polarFacingX =  facing;
+			}
+			
+			x2 = uX+(polarDistance*Cos(polarFacingX));
+			y2 = uY+(polarDistance*Sin(polarFacingX));
+			polarDistance = y;
+			
+			if (shifterY == 2) {
+				polarFacingY = facing;
+			}
+			else if (shifterY == 0) {
+				polarFacingY = 180 + facing;
+			}
+			else {
+				polarFacingY = facing;
+			}
+			x2 = x2+(polarDistance*Cos(polarFacingY));
+			y2 = y2+(polarDistance*Sin(polarFacingY));
+			
+			return FixedToString(x2,3) + " " + FixedToString(y2,3);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+
+	
+	return "0";
+}
+
+
 //Gets UnitX
 string LibapxVariableFunctionUnitX(int p, unitgroup u, string argv) {
 
@@ -253,4 +466,511 @@ string LibapxVariableFunctionRandomInt(int p, unitgroup u, string argv) {
     }
 
     return IntToString(RandomInt(in1, in2));
+}
+
+
+// Series of String Functions
+
+
+// //Gets Unit's Behavior Count Number
+// string LibapxVariableFunctionReplaceWord(int p, unitgroup u, string argv) {
+//     string String = StringWord(argv, 1);
+//     string replace = StringWord(argv, 2);
+//     string replaceword = StringWord(argv, 3);
+
+//     String = StringReplaceWord(String,replace,replaceword,c_stringReplaceAll,c_stringCase);
+
+
+//     return String;
+    
+// }
+//Basically StringContains
+string LibapxVariableFunctionString(int p, unitgroup u, string argv) {
+
+	if(StringContains(StringSub(argv, StringLength(StringWord(argv,1) + " ") + 2, StringLength(argv)),StringWord(argv,1),c_stringAnywhere,c_stringCase)){
+		return "1";
+	}
+	else {
+		return "0";
+	}
+
+    return "0";
+}
+
+string LibapxVariableFunctionStringContainsSensitive(int p, unitgroup u, string argv) {
+
+	if(StringContains(StringSub(argv, StringLength(StringWord(argv,1) + " ") + 2, StringLength(argv)),StringWord(argv,1),c_stringAnywhere,c_stringCase)){
+		return "1";
+	}
+	else {
+		return "0";
+	}
+
+    return "0";
+}
+
+string LibapxVariableFunctionStringContainsInsensitive(int p, unitgroup u, string argv) {
+
+	if(StringContains(StringSub(argv, StringLength(StringWord(argv,1) + " ") + 2, StringLength(argv)),StringWord(argv,1),c_stringAnywhere,c_stringNoCase)){
+		return "1";
+	}
+	else {
+		return "0";
+	}
+
+    return "0";
+}
+
+string LibapxVariableFunctionStringFindSensitive(int p, unitgroup u, string argv) {
+
+    return IntToString(StringFind(StringSub(argv, StringLength(StringWord(argv,1) + " ") + 2, StringLength(argv)),StringWord(argv,1),true));
+}
+
+string LibapxVariableFunctionStringFindInsensitive(int p, unitgroup u, string argv) {
+
+    return IntToString(StringFind(StringSub(argv, StringLength(StringWord(argv,1) + " ") + 2, StringLength(argv)),StringWord(argv,1),false));
+}
+
+static bool LibapxHasActorRef(string ref) {
+	string scope;
+	if( ref != "" ) { // disregard if ref is invalid
+		scope = StringSub(ref, 1, 2);
+		if( scope == "__" || scope == "->" ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//Get String like the @get command from actor debug text.
+string LibapxVariableFunctionStringGet(int p, unitgroup u, string argv) {
+	int indexCount;
+	int i = 6; //this is just because " Model[" has 6 chars
+	int end = 0;
+	text infoText;
+	string infoString;
+	string category;
+	string findBracket;
+	string choice;
+	//Target Actor
+	string target = "::Main";
+	string val;
+	int paramOffset;
+	string getString;
+
+	// So that the argv is realligned lol
+	argv = "@get " + argv;
+
+
+
+	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
+        LibapxPrintError(p, "Command can only be used on one unit.");
+        return "";
+    }
+	
+
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
+		target = StringReplaceWord(StringWord(argv, 2),"->","",1,c_stringNoCase);
+		paramOffset = 1;
+	}
+	val = StringWord(argv, 2 + paramOffset);
+	val = StringCase(StringSub(val, 1, 1), true) + StringSub(val, 2, StringLength(val));
+
+	category = StringWord(argv,2 + paramOffset);
+
+
+
+
+	if (StringWord(argv,2) == "" ){
+		LibapxPrintError(p,"Please Provide a Field  Input");
+		LibapxPrintText(PlayerGroupSingle(p),StringToText("<c val=\"1abc9c\">Usage</c>: @get ( Model | Actor | SiteOps | Host | Full )"));
+		return "";
+	}
+	
+
+
+	// TODO: Add a function to find all available fields.
+
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		category = category + "[";
+		i = StringLength(category);
+		infoText = ActorGetText(ActorFromActor(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),target));
+		infoString = TextToString(infoText);
+
+		if (StringContains(category,"Full",c_stringAnywhere,c_stringNoCase)){
+			return StringReplaceWord(StringReplaceWord(infoString,"]","]<n>",c_stringReplaceAll,c_stringCase),"[","[",c_stringReplaceAll,c_stringCase);
+		}
+		else if (StringContains(category,"Model",c_stringAnywhere,c_stringNoCase)){
+		choice = "Actor Model: ";
+		}
+		else if (StringContains(category,"Actor",c_stringAnywhere,c_stringNoCase)){
+			getString = "<c val=\"1abc9c\">Actor: " + StringReplaceWord(StringReplaceWord(StringWord(infoString,4),"]","]",c_stringReplaceAll,c_stringCase),"[","[",c_stringReplaceAll,c_stringCase);
+			getString = StringSub(getString,StringFind(getString,"[",true)+1,StringFind(getString,"]",true)-1);
+			return getString;
+		}
+		else if (category == "" || !StringContains(infoString,category,c_stringAnywhere,c_stringNoCase)){
+			LibapxPrintError(p,"Field Unavailable");
+			LibapxPrintText(PlayerGroupSingle(p),StringToText("<c val=\"1abc9c\">Usage</c>: @get ( Model | Actor | SiteOps | Host | Full )"));
+			return "";
+		} 
+		else {
+			choice = "Actor" + category + ":";
+		}
+		
+		indexCount = StringFind(infoString,category,c_stringNoCase) -1;
+		
+		//make a loop that keeps increasing a number based on string position until it finds a closing bracket ("]")
+		for (i = indexCount; findBracket != "]"; i+=1 ) {
+			findBracket = StringSub(infoString, i,i);
+			// LibapxPrintOutput(p,findBracket);
+			end = end + 1;
+		}
+
+		infoString = StringSub(infoString, indexCount + StringLength(category), indexCount + end);
+		infoString = StringSub(infoString,2,StringLength(infoString)-2);
+
+
+		UnitGroupLoopStep();
+		
+	}
+	UnitGroupLoopEnd();
+
+	return infoString;
+}
+
+
+
+//Compare Two Words (Case-Insensitive) "&strcmp()"
+string LibapxVariableFunctionStringCompare(int p, unitgroup u, string argv) {
+	int compare = StringCompare(StringWord(argv,1),StringWord(argv,2),true);
+
+	if(compare > 0){
+		return "1";
+	} 
+	else if(compare < 0) {
+		return "1";
+	}
+	else {
+		return "0";
+	}
+
+	return "0";
+}
+
+//Compare Two Words (Not Case Sensitive) "&strcmpi()"
+string LibapxVariableFunctionStringCompareInsensitive(int p, unitgroup u, string argv) {
+
+	if(StringWord(argv,1) == StringWord(argv,2)){
+		return "1";
+	}
+
+    return "0";
+}
+
+//Upper Case String
+string LibapxVariableFunctionStringUpper(int p, unitgroup u, string argv) {
+	string String;
+
+	String = StringSub(argv, 1, StringLength(argv) - 1);
+	String = StringCase(String,true);
+
+    return String;
+}
+//Lower Case String
+string LibapxVariableFunctionStringLower(int p, unitgroup u, string argv) {
+	string String;
+
+	String = StringSub(argv, 1, StringLength(argv) - 1);
+	String = StringCase(String,false);
+
+    return String;
+}
+//Repeat String # of Times
+string LibapxVariableFunctionStringRepeat(int p, unitgroup u, string argv) {
+	string repeat = StringWord(argv,1);
+	string String;
+	string substring;
+	int i = StringToInt(repeat);
+
+	substring = StringSub(argv, StringLength(repeat + " ") + 2, StringLength(argv) - 1);
+	while (i != 0) {
+		String = String + substring;
+		i -= 1;
+	}
+
+
+    return String;
+}
+//Get Substring From String
+string LibapxVariableFunctionStringSub(int p, unitgroup u, string argv) {
+	string start = StringWord(argv,1);
+	string end = StringWord(argv,2);
+	string String;
+
+	String = StringSub(argv, StringLength(start + " " + end + " ") + 2, StringLength(argv));
+	String = StringSub(String, StringToInt(start), StringToInt(end));
+
+    return String;
+}
+//Get Word From String
+string LibapxVariableFunctionStringWord(int p, unitgroup u, string argv) {
+	string word = StringWord(argv,1);
+	string String;
+
+	String = StringSub(argv, StringLength(word + " ") + 1, StringLength(argv));
+	String = StringWord(String, StringToInt(word));
+
+    return String;
+}
+//Gets String Length from String
+string LibapxVariableFunctionLength(int p, unitgroup u, string argv) {
+    string String = argv;
+
+    String = IntToString(StringLength(String)-2);
+
+    return String; 
+}
+//Gets Unit Type String
+string LibapxVariableFunctionUnit(int p, unitgroup u, string argv) {
+    string Name = UnitGetType(UnitGroupUnit(u,1));
+
+
+    return Name;
+    
+}
+//Gets Unit's Name String
+string LibapxVariableFunctionName(int p, unitgroup u, string argv) {
+    string Name = TextToString(LibapxUnitGetName(UnitGroupUnit(u,1)));
+
+    Name = StringReplaceWord(Name,StringWord(Name,1),"<c ",1,c_stringCase);
+
+
+    return Name;
+    
+}
+//Gets Unit's Desc String
+string LibapxVariableFunctionDesc(int p, unitgroup u, string argv) {
+    string id = LibapxUnitId(UnitGroupUnit(u,1));
+
+
+
+    return DataTableGetString(true, gDescIdentifier + id);
+    
+}
+//Gets Unit's Subtitle String
+string LibapxVariableFunctionSubtitle(int p, unitgroup u, string argv) {
+    string id = LibapxUnitId(UnitGroupUnit(u,1));
+
+
+
+    return DataTableGetString(true, gSubtitleIdentifier + id);
+    
+}
+//Replace a word in given string.
+string LibapxVariableFunctionReplaceWord(int p, unitgroup u, string argv) {
+	string repeats = StringWord(argv,1);
+	string replaceword = StringWord(argv,2);
+	string replacer = StringWord(argv,3);
+	string String;
+	// string String = argv;
+    // int num = StringToInt(StringWord(String,1));
+	if (replaceword == "<space>") {
+		replaceword = " ";
+		argv = StringReplaceWord(argv,"<space>"," ",c_stringReplaceAll,c_stringCase);
+		
+	}
+
+	if (replacer == "<space>") {
+		replacer = " ";
+		argv = StringReplaceWord(argv,"<space>"," ",c_stringReplaceAll,c_stringCase);
+	}
+
+	String = StringSub(argv, StringLength(repeats + " " + replaceword + " " + replacer + " ") + 2, StringLength(argv));
+	String = StringReplaceWord(String,replaceword,replacer, StringToInt(repeats),c_stringCase);
+	
+
+
+
+    // String = StringWord(argv, num);
+
+
+    return String;
+    
+}
+//Gets Unit's Relative Position String
+string LibapxVariableFunctionRelativePosition(int p, unitgroup u, string argv) {
+    fixed x;
+	fixed y;
+	int shifterX = 1; // 0 is subtract, 2 is add.
+	int shifterY = 1;
+	unitgroup g = u;
+	int i;
+	point UnitPos;
+	fixed uX;
+	fixed uY;
+	fixed x2;
+	fixed facing;
+	fixed y2;
+	bool relative = false;
+	fixed polarDistance;
+	fixed polarFacingX;
+	fixed polarFacingY;
+	fixed polarFacing;
+	fixed leg1;
+	fixed leg2;
+
+
+	if(StringWord( argv,1) == "-rel") {
+		relative = true;
+		argv = StringReplaceWord(argv, "-rel", "",1,c_stringNoCase);
+	}
+
+	if(StringWord( argv, 1) == "") { //display unit coords
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+            return FixedToString(PointGetX(UnitGetPosition(UnitGroupLoopCurrent())),2) + " " + FixedToString(PointGetY(UnitGetPosition(UnitGroupLoopCurrent())),2);
+            UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+
+	if(StringWord( argv, 2) == "") {
+		LibapxPrintError(p,"@pos requires both an X and Y coordinate to move a unit to (X,Y)");
+		return "0";
+	}
+	//:TODO Arithmatic in Position
+	//Yebois
+
+
+
+
+	// x Stuff
+	// + or - found, isolating
+	if (StringFind(StringWord(argv, 1), "+", c_stringNoCase) != -1 ) {
+		//It's a +
+		shifterX = 2;
+		//Now remove the +
+		i = StringFind(StringWord(argv, 1), "+", c_stringNoCase);
+		x = StringToFixed(StringReplace(StringWord(argv, 1), "", i, i));
+	}
+	else if (StringFind(StringWord(argv, 1), "-", c_stringNoCase) != -1 ) {
+		//It's a -
+		shifterX = 0;
+		//Now remove the -
+		i = StringFind(StringWord(argv, 1), "-", c_stringNoCase);
+		x = StringToFixed(StringReplace(StringWord(argv, 1), "", i, i));
+	}
+	else {
+		shifterX= 1;
+		x = StringToFixed(StringWord(argv, 1));
+	}
+
+
+
+
+	// y Stuff
+	// + or - found, isolating
+	if (StringFind(StringWord(argv, 2), "+", c_stringNoCase) != -1 ) {
+		//It's a +
+		shifterY = 2;
+		//Now remove the +
+		i = StringFind(StringWord(argv, 2), "+", c_stringNoCase);
+		y = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+	}
+	else if (StringFind(StringWord(argv, 2), "-", c_stringNoCase) != -1 ) {
+		//It's a -
+		shifterY = 0;
+		//Now remove the -
+		i = StringFind(StringWord(argv, 2), "-", c_stringNoCase);
+		y = StringToFixed(StringReplace(StringWord(argv, 2), "", i, i));
+	}
+	else {
+		shifterY = 1;
+		y = StringToFixed(StringWord(argv, 2));y = StringToFixed(StringWord(argv, 2));
+	}
+
+
+	if(relative) {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+			uX = PointGetX(UnitPos);
+			uY = PointGetY(UnitPos);
+			facing = UnitGetFacing(UnitGroupLoopCurrent());
+			polarDistance = x;
+
+			if (shifterX == 2) {
+				polarFacingX = 90 + facing;
+			}
+			else if (shifterX == 0) {
+				polarFacingX = 270 + facing;
+			}
+			else {
+				polarFacingX =  facing;
+			}
+			
+			x2 = uX+(polarDistance*Cos(polarFacingX));
+			y2 = uY+(polarDistance*Sin(polarFacingX));
+			polarDistance = y;
+			
+			if (shifterY == 2) {
+				polarFacingY = facing;
+			}
+			else if (shifterY == 0) {
+				polarFacingY = 180 + facing;
+			}
+			else {
+				polarFacingY = facing;
+			}
+			x2 = x2+(polarDistance*Cos(polarFacingY));
+			y2 = y2+(polarDistance*Sin(polarFacingY));
+			
+
+			return FixedToString(x2,2) + " " + FixedToString(y2,2);
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+	else {
+		UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone())
+		{
+			UnitPos = UnitGetPosition(UnitGroupLoopCurrent());
+			uX = PointGetX(UnitPos);
+			uY = PointGetY(UnitPos);
+	
+			if (shifterX == 2) {
+				x2 = uX + x;
+			}
+			else if (shifterX == 0) {
+				x2 = uX - x;
+			}
+			else {
+				x2 = x;
+			}
+			if (shifterY == 2) {
+				y2 = uY + y;
+			}
+			else if (shifterY == 0) {
+				y2 = uY - y;
+			}
+			else {
+				y2 = y;
+			}
+	
+	
+	
+			UnitGroupLoopStep();
+		}
+		UnitGroupLoopEnd();
+	}
+
+    return FixedToString(x2,2) + " " + FixedToString(y2,2);;
+    
+    
 }

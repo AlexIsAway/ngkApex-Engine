@@ -20,376 +20,928 @@ bool LibapxKeyPressedDown(bool testConds, bool runActions) {
 			UISetSelectionTypeEnabled(PlayerGroupSingle(user), c_localSelectionTypeUnknown, true);
 		}
 	}
-	if( EventKeyPressed() == c_keyAlt ) {
-		gv_LibapxPlayer[user].keyAlt = true;
-	}
-	if( EventKeyPressed() == c_keyTab ) {
-		gv_LibapxPlayer[user].keyTab = true;
-	}
-	if( EventKeyPressed() == c_keyShift ) {
-		gv_LibapxPlayer[user].keyShift = true;
-	}
-	if( EventKeyPressed() == c_keyGrave) {
-		gv_LibapxPlayer[user].keyGrave = true;
-	}
-	if( EventKeyPressed() == c_key0 ) {
-		gv_LibapxPlayer[user].key_0 = true;
-	}
-	if( EventKeyPressed() == c_key1 ) {
-		gv_LibapxPlayer[user].key_1 = true;
-	}
-	if( EventKeyPressed() == c_key2 ) {
-		gv_LibapxPlayer[user].key_2 = true;
-	}
-	if( EventKeyPressed() == c_key3 ) {
-		gv_LibapxPlayer[user].key_3 = true;
-	}
-	if( EventKeyPressed() == c_key4 ) {
-		gv_LibapxPlayer[user].key_4 = true;
-	}
-	if( EventKeyPressed() == c_key5 ) {
-		gv_LibapxPlayer[user].key_5 = true;
-	}
-	if( EventKeyPressed() == c_key6 ) {
-		gv_LibapxPlayer[user].key_6 = true;
-	}
-	if( EventKeyPressed() == c_key7 ) {
-		gv_LibapxPlayer[user].key_7 = true;
-	}
-	if( EventKeyPressed() == c_key8 ) {
-		gv_LibapxPlayer[user].key_8 = true;
-	}
-	if( EventKeyPressed() == c_key9 ) {
-		gv_LibapxPlayer[user].key_9 = true;
-	}
-	if( EventKeyPressed() == c_keyA ) {
-		gv_LibapxPlayer[user].keyA = true;
-	}
-	if( EventKeyPressed() == c_keyB ) {
-		gv_LibapxPlayer[user].keyB = true;
-	}
-	if( EventKeyPressed() == c_keyC ) {
-		gv_LibapxPlayer[user].keyC = true;
-	}
-	if( EventKeyPressed() == c_keyD ) {
-		gv_LibapxPlayer[user].keyD = true;
-	}
-	if( EventKeyPressed() == c_keyE ) {
-		gv_LibapxPlayer[user].keyE = true;
-	}
-	if( EventKeyPressed() == c_keyF ) {
-		gv_LibapxPlayer[user].keyF = true;
-	}
-	if( EventKeyPressed() == c_keyG ) {
-		gv_LibapxPlayer[user].keyG = true;
-	}
-	if( EventKeyPressed() == c_keyH ) {
-		gv_LibapxPlayer[user].keyH = true;
-	}
-	if( EventKeyPressed() == c_keyI ) {
-		gv_LibapxPlayer[user].keyI = true;
-	}
-	if( EventKeyPressed() == c_keyJ ) {
-		gv_LibapxPlayer[user].keyJ = true;
-	}
-	if( EventKeyPressed() == c_keyK ) {
-		gv_LibapxPlayer[user].keyK = true;
-	}
-	if( EventKeyPressed() == c_keyL ) {
-		gv_LibapxPlayer[user].keyL = true;
-	}
-	if( EventKeyPressed() == c_keyM ) {
-		gv_LibapxPlayer[user].keyM = true;
-	}
-	if( EventKeyPressed() == c_keyN ) {
-		gv_LibapxPlayer[user].keyN = true;
-	}
-	if( EventKeyPressed() == c_keyO ) {
-		gv_LibapxPlayer[user].keyO = true;
-	}
-	if( EventKeyPressed() == c_keyP ) {
-		gv_LibapxPlayer[user].keyP = true;
-	}
-	if( EventKeyPressed() == c_keyQ ) {
-		gv_LibapxPlayer[user].keyQ = true;
-	}
-	if( EventKeyPressed() == c_keyR ) {
-		gv_LibapxPlayer[user].keyR = true;
-	}
-	if( EventKeyPressed() == c_keyS ) {
-		gv_LibapxPlayer[user].keyS = true;
-	}
-	if( EventKeyPressed() == c_keyT ) {
-		gv_LibapxPlayer[user].keyT = true;
-	}
-	if( EventKeyPressed() == c_keyU ) {
-		gv_LibapxPlayer[user].keyU = true;
-	}
-	if( EventKeyPressed() == c_keyV ) {
-		gv_LibapxPlayer[user].keyV = true;
-	}
-	if( EventKeyPressed() == c_keyW ) {
-		gv_LibapxPlayer[user].keyW = true;
-	}
-	if( EventKeyPressed() == c_keyX ) {
-		gv_LibapxPlayer[user].keyX = true;
-	}
-	if( EventKeyPressed() == c_keyY ) {
-		gv_LibapxPlayer[user].keyY = true;
-	}
-	if( EventKeyPressed() == c_keyZ ) {
-		gv_LibapxPlayer[user].keyZ = true;
-	}
-	if( EventKeyPressed() == c_keyUp ) {
-		gv_LibapxPlayer[user].keyUp = true;
-	}
-	if( EventKeyPressed() == c_keyDown ) {
-		gv_LibapxPlayer[user].keyDown = true;
-	}
-	if( EventKeyPressed() == c_keyLeft ) {
-		gv_LibapxPlayer[user].keyLeft = true;
-	}
-	if( EventKeyPressed() == c_keyRight ) {
-		gv_LibapxPlayer[user].keyRight = true;
-	}
-	if( EventKeyPressed() == c_keyPageUp ) {
-		gv_LibapxPlayer[user].keyPgUp = true;
-	}
-	if( EventKeyPressed() == c_keyPageDown ) {
-		gv_LibapxPlayer[user].keyPgDown = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad0 ) {
-		gv_LibapxPlayer[user].keyNumPad0 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad1 ) {
-		gv_LibapxPlayer[user].keyNumPad1 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad2 ) {
-		gv_LibapxPlayer[user].keyNumPad2 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad3 ) {
-		gv_LibapxPlayer[user].keyNumPad3 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad4 ) {
-		gv_LibapxPlayer[user].keyNumPad4 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad5 ) {
-		gv_LibapxPlayer[user].keyNumPad5 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad6 ) {
-		gv_LibapxPlayer[user].keyNumPad6 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad7 ) {
-		gv_LibapxPlayer[user].keyNumPad7 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad8 ) {
-		gv_LibapxPlayer[user].keyNumPad8 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPad9 ) {
-		gv_LibapxPlayer[user].keyNumPad9 = true;
-	}
-	if( EventKeyPressed() == c_keyNumPadPlus ) {
-		gv_LibapxPlayer[user].keyNumPadPlus = true;
-	}
-	if( EventKeyPressed() == c_keyNumPadMultiply ) {
-		gv_LibapxPlayer[user].keyNumPadMultiply = true;
-	}
-	if( EventKeyPressed() == c_keyNumPadDivide ) {
-		gv_LibapxPlayer[user].keyNumPadDivide = true;
-	}
-	if( EventKeyPressed() == c_keyNumPadDecimal ) {
-		gv_LibapxPlayer[user].keyNumPadDecimal = true;
-	}
+    // if( EventKeyPressed() == c_keyEscape ) {
+    //     gv_LibapxPlayer[user].c_keyEscape = true;
+    //     LibapxUnitKeypressCheck("key_escape",gv_LibapxPlayer[user].c_keyEscape);
+    // }
+    if( EventKeyPressed() == c_mouseButtonRight ) {
+        gv_LibapxPlayer[user].mouseRight = true;
+        LibapxUnitKeypressCheck("key_mouseRight",gv_LibapxPlayer[user].mouseRight);
+        while(gv_LibapxPlayer[user].mouseRight == true && KeypressTimerCheck("key_mouseRight")){
+            Wait(KeypressTimer("key_mouseRight"),c_timeGame);
+            if(gv_LibapxPlayer[user].mouseRight == true){
+            LibapxUnitKeypressCheck("key_mouseRight",gv_LibapxPlayer[user].mouseRight);
+            }
+        }
+    }
+    if( EventKeyPressed() == c_mouseButtonLeft ) {
+        gv_LibapxPlayer[user].mouseLeft = true;
+        LibapxUnitKeypressCheck("key_mouseLeft",gv_LibapxPlayer[user].mouseLeft);
+        while(gv_LibapxPlayer[user].mouseLeft == true && KeypressTimerCheck("key_mouseLeft")){
+            Wait(KeypressTimer("key_mouseLeft"),c_timeGame);
+            if(gv_LibapxPlayer[user].mouseLeft == true){
+            LibapxUnitKeypressCheck("key_mouseLeft",gv_LibapxPlayer[user].mouseLeft);
+            }
+        }
+    }
+    if( EventKeyPressed() == c_mouseButtonMiddle ) {
+        gv_LibapxPlayer[user].mouseMiddle = true;
+        LibapxUnitKeypressCheck("key_mouseMiddle",gv_LibapxPlayer[user].mouseMiddle);
+        while(gv_LibapxPlayer[user].mouseMiddle == true && KeypressTimerCheck("key_mouseMiddle")){
+            Wait(KeypressTimer("key_mouseMiddle"),c_timeGame);
+            if(gv_LibapxPlayer[user].mouseMiddle == true){
+            LibapxUnitKeypressCheck("key_mouseMiddle",gv_LibapxPlayer[user].mouseMiddle);
+            }
+        }
+    }
 
-	LibapxUnitKeypressCheck();
+    if( EventKeyPressed() == c_keyControl ) {
+        gv_LibapxPlayer[user].keyCtrl = true;
+        LibapxUnitKeypressCheck("key_control",gv_LibapxPlayer[user].keyCtrl);
+        while(gv_LibapxPlayer[user].keyCtrl == true && KeypressTimerCheck("key_control")){
+            Wait(KeypressTimer("key_control"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyCtrl == true){
+            LibapxUnitKeypressCheck("key_control",gv_LibapxPlayer[user].keyCtrl);
+            }
+        }
+    }
+    if( EventKeyPressed() == c_keyAlt ) {
+        gv_LibapxPlayer[user].keyAlt = true;
+        LibapxUnitKeypressCheck("key_alt",gv_LibapxPlayer[user].keyAlt);
+        while(gv_LibapxPlayer[user].keyAlt == true && KeypressTimerCheck("key_alt")){
+            Wait(KeypressTimer("key_alt"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyAlt == true){
+            LibapxUnitKeypressCheck("key_alt",gv_LibapxPlayer[user].keyAlt);
+            }
+        }
+    }
+    if( EventKeyPressed() == c_keyTab ) {
+        gv_LibapxPlayer[user].keyTab = true;
+        LibapxUnitKeypressCheck("key_tab",gv_LibapxPlayer[user].keyTab);
+        while(gv_LibapxPlayer[user].keyTab == true && KeypressTimerCheck("key_tab")){
+            Wait(KeypressTimer("key_tab"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyTab == true){
+            LibapxUnitKeypressCheck("key_tab",gv_LibapxPlayer[user].keyTab);
+            }
+        }
+    }
+
+    if( EventKeyPressed() == c_keyShift ) {
+        gv_LibapxPlayer[user].keyShift = true;
+        LibapxUnitKeypressCheck("key_shift",gv_LibapxPlayer[user].keyShift);
+        while(gv_LibapxPlayer[user].keyShift == true && KeypressTimerCheck("key_shift")){
+            Wait(KeypressTimer("key_shift"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyShift == true){
+            LibapxUnitKeypressCheck("key_shift",gv_LibapxPlayer[user].keyShift);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyGrave) {
+        gv_LibapxPlayer[user].keyGrave = true;
+        LibapxUnitKeypressCheck("key_grave",gv_LibapxPlayer[user].keyGrave);
+        while(gv_LibapxPlayer[user].keyGrave == true && KeypressTimerCheck("key_grave")){
+            Wait(KeypressTimer("key_grave"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyGrave == true){
+            LibapxUnitKeypressCheck("key_grave",gv_LibapxPlayer[user].keyGrave);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key0 ) {
+        gv_LibapxPlayer[user].key_0 = true;
+        LibapxUnitKeypressCheck("key_0",gv_LibapxPlayer[user].key_0);
+        while(gv_LibapxPlayer[user].key_0 == true && KeypressTimerCheck("key_0")){
+            Wait(KeypressTimer("key_0"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_0 == true){
+            LibapxUnitKeypressCheck("key_0",gv_LibapxPlayer[user].key_0);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key1 ) {
+        gv_LibapxPlayer[user].key_1 = true;
+        LibapxUnitKeypressCheck("key_1",gv_LibapxPlayer[user].key_1);
+        while(gv_LibapxPlayer[user].key_1 == true && KeypressTimerCheck("key_1")){
+            Wait(KeypressTimer("key_1"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_1 == true){
+            LibapxUnitKeypressCheck("key_1",gv_LibapxPlayer[user].key_1);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key2 ) {
+        gv_LibapxPlayer[user].key_2 = true;
+        LibapxUnitKeypressCheck("key_2",gv_LibapxPlayer[user].key_2);
+        while(gv_LibapxPlayer[user].key_2 == true && KeypressTimerCheck("key_2")){
+            Wait(KeypressTimer("key_2"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_2 == true){
+            LibapxUnitKeypressCheck("key_2",gv_LibapxPlayer[user].key_2);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key3 ) {
+        gv_LibapxPlayer[user].key_3 = true;
+        LibapxUnitKeypressCheck("key_3",gv_LibapxPlayer[user].key_3);
+        while(gv_LibapxPlayer[user].key_3 == true && KeypressTimerCheck("key_3")){
+            Wait(KeypressTimer("key_3"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_3 == true){
+            LibapxUnitKeypressCheck("key_3",gv_LibapxPlayer[user].key_3);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key4 ) {
+        gv_LibapxPlayer[user].key_4 = true;
+        LibapxUnitKeypressCheck("key_4",gv_LibapxPlayer[user].key_4);
+        while(gv_LibapxPlayer[user].key_4 == true && KeypressTimerCheck("key_4")){
+            Wait(KeypressTimer("key_4"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_4 == true){
+            LibapxUnitKeypressCheck("key_4",gv_LibapxPlayer[user].key_4);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key5 ) {
+        gv_LibapxPlayer[user].key_5 = true;
+        LibapxUnitKeypressCheck("key_5",gv_LibapxPlayer[user].key_5);
+        while(gv_LibapxPlayer[user].key_5 == true && KeypressTimerCheck("key_5")){
+            Wait(KeypressTimer("key_5"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_5 == true){
+            LibapxUnitKeypressCheck("key_5",gv_LibapxPlayer[user].key_5);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key6 ) {
+        gv_LibapxPlayer[user].key_6 = true;
+        LibapxUnitKeypressCheck("key_6",gv_LibapxPlayer[user].key_6);
+        while(gv_LibapxPlayer[user].key_6 == true && KeypressTimerCheck("key_6")){
+            Wait(KeypressTimer("key_6"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_6 == true){
+            LibapxUnitKeypressCheck("key_6",gv_LibapxPlayer[user].key_6);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key7 ) {
+        gv_LibapxPlayer[user].key_7 = true;
+        LibapxUnitKeypressCheck("key_7",gv_LibapxPlayer[user].key_7);
+        while(gv_LibapxPlayer[user].key_7 == true && KeypressTimerCheck("key_7")){
+            Wait(KeypressTimer("key_7"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_7 == true){
+            LibapxUnitKeypressCheck("key_7",gv_LibapxPlayer[user].key_7);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key8 ) {
+        gv_LibapxPlayer[user].key_8 = true;
+        LibapxUnitKeypressCheck("key_8",gv_LibapxPlayer[user].key_8);
+        while(gv_LibapxPlayer[user].key_8 == true && KeypressTimerCheck("key_8")){
+            Wait(KeypressTimer("key_8"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_8 == true){
+            LibapxUnitKeypressCheck("key_8",gv_LibapxPlayer[user].key_8);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_key9 ) {
+        gv_LibapxPlayer[user].key_9 = true;
+        LibapxUnitKeypressCheck("key_9",gv_LibapxPlayer[user].key_9);
+        while(gv_LibapxPlayer[user].key_9 == true && KeypressTimerCheck("key_9")){
+            Wait(KeypressTimer("key_9"),c_timeGame);
+            if(gv_LibapxPlayer[user].key_9 == true){
+            LibapxUnitKeypressCheck("key_9",gv_LibapxPlayer[user].key_9);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyA ) {
+        gv_LibapxPlayer[user].keyA = true;
+        LibapxUnitKeypressCheck("key_a",gv_LibapxPlayer[user].keyA);
+        while(gv_LibapxPlayer[user].keyA == true && KeypressTimerCheck("key_a")){
+            Wait(KeypressTimer("key_a"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyA == true){
+            LibapxUnitKeypressCheck("key_a",gv_LibapxPlayer[user].keyA);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyB ) {
+        gv_LibapxPlayer[user].keyB = true;
+        LibapxUnitKeypressCheck("key_b",gv_LibapxPlayer[user].keyB);
+        while(gv_LibapxPlayer[user].keyB == true && KeypressTimerCheck("key_b")){
+            Wait(KeypressTimer("key_b"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyB == true){
+            LibapxUnitKeypressCheck("key_b",gv_LibapxPlayer[user].keyB);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyC ) {
+        gv_LibapxPlayer[user].keyC = true;
+        LibapxUnitKeypressCheck("key_c",gv_LibapxPlayer[user].keyC);
+        while(gv_LibapxPlayer[user].keyC == true && KeypressTimerCheck("key_c")){
+            Wait(KeypressTimer("key_c"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyC == true){
+            LibapxUnitKeypressCheck("key_c",gv_LibapxPlayer[user].keyC);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyD ) {
+        gv_LibapxPlayer[user].keyD = true;
+        LibapxUnitKeypressCheck("key_d",gv_LibapxPlayer[user].keyD);
+        while(gv_LibapxPlayer[user].keyD == true && KeypressTimerCheck("key_d")){
+            Wait(KeypressTimer("key_d"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyD == true){
+            LibapxUnitKeypressCheck("key_d",gv_LibapxPlayer[user].keyD);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyE ) {
+        gv_LibapxPlayer[user].keyE = true;
+        LibapxUnitKeypressCheck("key_e",gv_LibapxPlayer[user].keyE);
+        while(gv_LibapxPlayer[user].keyE == true && KeypressTimerCheck("key_e")){
+            Wait(KeypressTimer("key_e"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyE == true){
+            LibapxUnitKeypressCheck("key_e",gv_LibapxPlayer[user].keyE);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyF ) {
+        gv_LibapxPlayer[user].keyF = true;
+        LibapxUnitKeypressCheck("key_f",gv_LibapxPlayer[user].keyF);
+        while(gv_LibapxPlayer[user].keyF == true && KeypressTimerCheck("key_f")){
+            Wait(KeypressTimer("key_f"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyF == true){
+            LibapxUnitKeypressCheck("key_f",gv_LibapxPlayer[user].keyF);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyG ) {
+        gv_LibapxPlayer[user].keyG = true;
+        LibapxUnitKeypressCheck("key_g",gv_LibapxPlayer[user].keyG);
+        while(gv_LibapxPlayer[user].keyG == true && KeypressTimerCheck("key_g")){
+            Wait(KeypressTimer("key_g"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyG == true){
+            LibapxUnitKeypressCheck("key_g",gv_LibapxPlayer[user].keyG);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyH ) {
+        gv_LibapxPlayer[user].keyH = true;
+        LibapxUnitKeypressCheck("key_h",gv_LibapxPlayer[user].keyH);
+        while(gv_LibapxPlayer[user].keyH == true && KeypressTimerCheck("key_h")){
+            Wait(KeypressTimer("key_h"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyH == true){
+            LibapxUnitKeypressCheck("key_h",gv_LibapxPlayer[user].keyH);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyI ) {
+        gv_LibapxPlayer[user].keyI = true;
+        LibapxUnitKeypressCheck("key_i",gv_LibapxPlayer[user].keyI);
+        while(gv_LibapxPlayer[user].keyI == true && KeypressTimerCheck("key_i")){
+            Wait(KeypressTimer("key_i"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyI == true){
+            LibapxUnitKeypressCheck("key_i",gv_LibapxPlayer[user].keyI);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyJ ) {
+        gv_LibapxPlayer[user].keyJ = true;
+        LibapxUnitKeypressCheck("key_j",gv_LibapxPlayer[user].keyJ);
+        while(gv_LibapxPlayer[user].keyJ == true && KeypressTimerCheck("key_j")){
+            Wait(KeypressTimer("key_j"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyJ == true){
+            LibapxUnitKeypressCheck("key_j",gv_LibapxPlayer[user].keyJ);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyK ) {
+        gv_LibapxPlayer[user].keyK = true;
+        LibapxUnitKeypressCheck("key_k",gv_LibapxPlayer[user].keyK);
+        while(gv_LibapxPlayer[user].keyK == true && KeypressTimerCheck("key_k")){
+            Wait(KeypressTimer("key_k"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyK == true){
+            LibapxUnitKeypressCheck("key_k",gv_LibapxPlayer[user].keyK);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyL ) {
+        gv_LibapxPlayer[user].keyL = true;
+        LibapxUnitKeypressCheck("key_l",gv_LibapxPlayer[user].keyL);
+        while(gv_LibapxPlayer[user].keyL == true && KeypressTimerCheck("key_l")){
+            Wait(KeypressTimer("key_l"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyL == true){
+            LibapxUnitKeypressCheck("key_l",gv_LibapxPlayer[user].keyL);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyM ) {
+        gv_LibapxPlayer[user].keyM = true;
+        LibapxUnitKeypressCheck("key_m",gv_LibapxPlayer[user].keyM);
+        while(gv_LibapxPlayer[user].keyM == true && KeypressTimerCheck("")){
+            Wait(KeypressTimer("key_m"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyM == true){
+            LibapxUnitKeypressCheck("key_m",gv_LibapxPlayer[user].keyM);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyN ) {
+        gv_LibapxPlayer[user].keyN = true;
+        LibapxUnitKeypressCheck("key_n",gv_LibapxPlayer[user].keyN);
+        while(gv_LibapxPlayer[user].keyN == true && KeypressTimerCheck("key_n")){
+            Wait(KeypressTimer("key_n"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyN == true){
+            LibapxUnitKeypressCheck("key_n",gv_LibapxPlayer[user].keyN);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyO ) {
+        gv_LibapxPlayer[user].keyO = true;
+        LibapxUnitKeypressCheck("key_o",gv_LibapxPlayer[user].keyO);
+        while(gv_LibapxPlayer[user].keyO == true && KeypressTimerCheck("key_o")){
+            Wait(KeypressTimer("key_o"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyO == true){
+            LibapxUnitKeypressCheck("key_o",gv_LibapxPlayer[user].keyO);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyP ) {
+        gv_LibapxPlayer[user].keyP = true;
+        LibapxUnitKeypressCheck("key_p",gv_LibapxPlayer[user].keyP);
+        while(gv_LibapxPlayer[user].keyP == true && KeypressTimerCheck("")){
+            Wait(KeypressTimer("key_p"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyP == true){
+            LibapxUnitKeypressCheck("key_p",gv_LibapxPlayer[user].keyP);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyQ ) {
+        gv_LibapxPlayer[user].keyQ = true;
+        LibapxUnitKeypressCheck("key_q",gv_LibapxPlayer[user].keyQ);
+        while(gv_LibapxPlayer[user].keyQ == true && KeypressTimerCheck("key_q")){
+            Wait(KeypressTimer("key_q"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyQ == true){
+            LibapxUnitKeypressCheck("key_q",gv_LibapxPlayer[user].keyQ);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyR ) {
+        gv_LibapxPlayer[user].keyR = true;
+        LibapxUnitKeypressCheck("key_r",gv_LibapxPlayer[user].keyR);
+        while(gv_LibapxPlayer[user].keyR == true && KeypressTimerCheck("key_r")){
+            Wait(KeypressTimer("key_r"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyR == true){
+            LibapxUnitKeypressCheck("key_r",gv_LibapxPlayer[user].keyR);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyS ) {
+        gv_LibapxPlayer[user].keyS = true;
+        LibapxUnitKeypressCheck("key_s",gv_LibapxPlayer[user].keyS);
+        while(gv_LibapxPlayer[user].keyS == true && KeypressTimerCheck("key_s")){
+            Wait(KeypressTimer("key_s"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyS == true){
+            LibapxUnitKeypressCheck("key_s",gv_LibapxPlayer[user].keyS);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyT ) {
+        gv_LibapxPlayer[user].keyT = true;
+        LibapxUnitKeypressCheck("key_t",gv_LibapxPlayer[user].keyT);
+        while(gv_LibapxPlayer[user].keyT == true && KeypressTimerCheck("key_t")){
+            Wait(KeypressTimer("key_t"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyT == true){
+            LibapxUnitKeypressCheck("key_t",gv_LibapxPlayer[user].keyT);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyU ) {
+        gv_LibapxPlayer[user].keyU = true;
+        LibapxUnitKeypressCheck("key_u",gv_LibapxPlayer[user].keyU);
+        while(gv_LibapxPlayer[user].keyU == true && KeypressTimerCheck("key_u")){
+            Wait(KeypressTimer("key_u"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyU == true){
+            LibapxUnitKeypressCheck("key_u",gv_LibapxPlayer[user].keyU);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyV ) {
+        gv_LibapxPlayer[user].keyV = true;
+        LibapxUnitKeypressCheck("key_v",gv_LibapxPlayer[user].keyV);
+        while(gv_LibapxPlayer[user].keyV == true && KeypressTimerCheck("key_v")){
+            Wait(KeypressTimer("key_v"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyV == true){
+            LibapxUnitKeypressCheck("key_v",gv_LibapxPlayer[user].keyV);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyW ) {
+        gv_LibapxPlayer[user].keyW = true;
+        LibapxUnitKeypressCheck("key_w",gv_LibapxPlayer[user].keyW);
+        while(gv_LibapxPlayer[user].keyW == true && KeypressTimerCheck("key_w")){
+            Wait(KeypressTimer("key_w"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyW == true){
+            LibapxUnitKeypressCheck("key_w",gv_LibapxPlayer[user].keyW);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyX ) {
+        gv_LibapxPlayer[user].keyX = true;
+        LibapxUnitKeypressCheck("key_x",gv_LibapxPlayer[user].keyX);
+        while(gv_LibapxPlayer[user].keyX == true && KeypressTimerCheck("key_x")){
+            Wait(KeypressTimer("key_x"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyX == true){
+            LibapxUnitKeypressCheck("key_x",gv_LibapxPlayer[user].keyX);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyY ) {
+        gv_LibapxPlayer[user].keyY = true;
+        LibapxUnitKeypressCheck("key_y",gv_LibapxPlayer[user].keyY);
+        while(gv_LibapxPlayer[user].keyY == true && KeypressTimerCheck("key_y")){
+            Wait(KeypressTimer("key_y"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyY == true){
+            LibapxUnitKeypressCheck("key_y",gv_LibapxPlayer[user].keyY);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyZ ) {
+        gv_LibapxPlayer[user].keyZ = true;
+        LibapxUnitKeypressCheck("key_z",gv_LibapxPlayer[user].keyZ);
+        while(gv_LibapxPlayer[user].keyZ == true && KeypressTimerCheck("key_z")){
+            Wait(KeypressTimer("key_z"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyZ == true){
+            LibapxUnitKeypressCheck("key_z",gv_LibapxPlayer[user].keyZ);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyUp ) {
+        gv_LibapxPlayer[user].keyUp = true;
+        LibapxUnitKeypressCheck("key_up",gv_LibapxPlayer[user].keyUp);
+        while(gv_LibapxPlayer[user].keyUp == true && KeypressTimerCheck("key_up")){
+            Wait(KeypressTimer("key_up"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyUp == true){
+            LibapxUnitKeypressCheck("key_up",gv_LibapxPlayer[user].keyUp);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyDown ) {
+        gv_LibapxPlayer[user].keyDown = true;
+        LibapxUnitKeypressCheck("key_down",gv_LibapxPlayer[user].keyDown);
+        while(gv_LibapxPlayer[user].keyDown == true && KeypressTimerCheck("key_down")){
+            Wait(KeypressTimer("key_down"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyDown == true){
+            LibapxUnitKeypressCheck("key_down",gv_LibapxPlayer[user].keyDown);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyLeft ) {
+        gv_LibapxPlayer[user].keyLeft = true;
+        LibapxUnitKeypressCheck("key_left",gv_LibapxPlayer[user].keyLeft);
+        while(gv_LibapxPlayer[user].keyLeft == true && KeypressTimerCheck("key_left")){
+            Wait(KeypressTimer("key_left"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyLeft == true){
+            LibapxUnitKeypressCheck("key_left",gv_LibapxPlayer[user].keyLeft);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyRight ) {
+        gv_LibapxPlayer[user].keyRight = true;
+        LibapxUnitKeypressCheck("key_right",gv_LibapxPlayer[user].keyRight);
+        while(gv_LibapxPlayer[user].keyRight == true && KeypressTimerCheck("key_right")){
+            Wait(KeypressTimer("key_right"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyRight == true){
+            LibapxUnitKeypressCheck("key_right",gv_LibapxPlayer[user].keyRight);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyPageUp ) {
+        gv_LibapxPlayer[user].keyPgUp = true;
+        LibapxUnitKeypressCheck("key_pgup",gv_LibapxPlayer[user].keyPgUp);
+        while(gv_LibapxPlayer[user].keyPgUp == true && KeypressTimerCheck("key_pgup")){
+            Wait(KeypressTimer("key_pgup"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyPgUp == true){
+            LibapxUnitKeypressCheck("key_pgup",gv_LibapxPlayer[user].keyPgUp);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyPageDown ) {
+        gv_LibapxPlayer[user].keyPgDown = true;
+        LibapxUnitKeypressCheck("key_pgdown",gv_LibapxPlayer[user].keyPgDown);
+        while(gv_LibapxPlayer[user].keyPgDown == true && KeypressTimerCheck("key_pgdown")){
+            Wait(KeypressTimer("key_pgdown"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyPgDown == true){
+            LibapxUnitKeypressCheck("key_pgdown",gv_LibapxPlayer[user].keyPgDown);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad0 ) {
+        gv_LibapxPlayer[user].keyNumPad0 = true;
+        LibapxUnitKeypressCheck("key_numpad0",gv_LibapxPlayer[user].keyNumPad0);
+        while(gv_LibapxPlayer[user].keyNumPad0 == true && KeypressTimerCheck("key_numpad0")){
+            Wait(KeypressTimer("key_numpad0"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad0 == true){
+            LibapxUnitKeypressCheck("key_numpad0",gv_LibapxPlayer[user].keyNumPad0);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad1 ) {
+        gv_LibapxPlayer[user].keyNumPad1 = true;
+        LibapxUnitKeypressCheck("key_numpad1",gv_LibapxPlayer[user].keyNumPad1);
+        while(gv_LibapxPlayer[user].keyNumPad1 == true && KeypressTimerCheck("key_numpad1")){
+            Wait(KeypressTimer("key_numpad1"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad1 == true){
+            LibapxUnitKeypressCheck("key_numpad1",gv_LibapxPlayer[user].keyNumPad1);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad2 ) {
+        gv_LibapxPlayer[user].keyNumPad2 = true;
+        LibapxUnitKeypressCheck("key_numpad2",gv_LibapxPlayer[user].keyNumPad2);
+        while(gv_LibapxPlayer[user].keyNumPad2 == true && KeypressTimerCheck("key_numpad2")){
+            Wait(KeypressTimer("key_numpad2"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad2 == true){
+            LibapxUnitKeypressCheck("key_numpad2",gv_LibapxPlayer[user].keyNumPad2);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad3 ) {
+        gv_LibapxPlayer[user].keyNumPad3 = true;
+        LibapxUnitKeypressCheck("key_numpad3",gv_LibapxPlayer[user].keyNumPad3);
+        while(gv_LibapxPlayer[user].keyNumPad3 == true && KeypressTimerCheck("key_numpad3")){
+            Wait(KeypressTimer("key_numpad3"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad3 == true){
+            LibapxUnitKeypressCheck("key_numpad3",gv_LibapxPlayer[user].keyNumPad3);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad4 ) {
+        gv_LibapxPlayer[user].keyNumPad4 = true;
+        LibapxUnitKeypressCheck("key_numpad4",gv_LibapxPlayer[user].keyNumPad4);
+        while(gv_LibapxPlayer[user].keyNumPad4 == true && KeypressTimerCheck("key_numpad4")){
+            Wait(KeypressTimer("key_numpad4"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad4 == true){
+            LibapxUnitKeypressCheck("key_numpad4",gv_LibapxPlayer[user].keyNumPad4);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad5 ) {
+        gv_LibapxPlayer[user].keyNumPad5 = true;
+        LibapxUnitKeypressCheck("key_numpad5",gv_LibapxPlayer[user].keyNumPad5);
+        while(gv_LibapxPlayer[user].keyNumPad5 == true && KeypressTimerCheck("")){
+            Wait(KeypressTimer("key_numpad5"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad5 == true){
+            LibapxUnitKeypressCheck("key_numpad5",gv_LibapxPlayer[user].keyNumPad5);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad6 ) {
+        gv_LibapxPlayer[user].keyNumPad6 = true;
+        LibapxUnitKeypressCheck("key_numpad6",gv_LibapxPlayer[user].keyNumPad6);
+        while(gv_LibapxPlayer[user].keyNumPad6 == true && KeypressTimerCheck("key_numpad6")){
+            Wait(KeypressTimer("key_numpad6"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad6 == true){
+            LibapxUnitKeypressCheck("key_numpad6",gv_LibapxPlayer[user].keyNumPad6);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad7 ) {
+        gv_LibapxPlayer[user].keyNumPad7 = true;
+        LibapxUnitKeypressCheck("key_numpad7",gv_LibapxPlayer[user].keyNumPad7);
+        while(gv_LibapxPlayer[user].keyTab == true && KeypressTimerCheck("key_numpad7")){
+            Wait(KeypressTimer("key_tab"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyTab == true){
+            LibapxUnitKeypressCheck("key_tab",gv_LibapxPlayer[user].keyTab);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad8 ) {
+        gv_LibapxPlayer[user].keyNumPad8 = true;
+        LibapxUnitKeypressCheck("key_numpad8",gv_LibapxPlayer[user].keyNumPad8);
+        while(gv_LibapxPlayer[user].keyTab == true && KeypressTimerCheck("key_numpad8")){
+            Wait(KeypressTimer("key_tab"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyTab == true){
+            LibapxUnitKeypressCheck("key_tab",gv_LibapxPlayer[user].keyTab);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPad9 ) {
+        gv_LibapxPlayer[user].keyNumPad9 = true;
+        LibapxUnitKeypressCheck("key_numpad9",gv_LibapxPlayer[user].keyNumPad9);
+        while(gv_LibapxPlayer[user].keyNumPad9 == true && KeypressTimerCheck("")){
+            Wait(KeypressTimer("key_numpad9"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPad9 == true){
+            LibapxUnitKeypressCheck("key_numpad9",gv_LibapxPlayer[user].keyNumPad9);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPadPlus ) {
+        gv_LibapxPlayer[user].keyNumPadPlus = true;
+        LibapxUnitKeypressCheck("key_numpadplus",gv_LibapxPlayer[user].keyNumPadPlus);
+        while(gv_LibapxPlayer[user].keyNumPadPlus == true && KeypressTimerCheck("key_numpadplus")){
+            Wait(KeypressTimer("key_numpadplus"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPadPlus == true){
+            LibapxUnitKeypressCheck("key_numpadplus",gv_LibapxPlayer[user].keyNumPadPlus);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPadMultiply ) {
+        gv_LibapxPlayer[user].keyNumPadMultiply = true;
+        LibapxUnitKeypressCheck("key_numpadminus",gv_LibapxPlayer[user].keyNumPadMultiply);
+        while(gv_LibapxPlayer[user].keyNumPadMultiply == true && KeypressTimerCheck("key_numpadminus")){
+            Wait(KeypressTimer("key_numpadminus"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPadMultiply == true){
+            LibapxUnitKeypressCheck("key_numpadminus",gv_LibapxPlayer[user].keyNumPadMultiply);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPadDivide ) {
+        gv_LibapxPlayer[user].keyNumPadDivide = true;
+        LibapxUnitKeypressCheck("key_numpadmultiply",gv_LibapxPlayer[user].keyNumPadDivide);
+        while(gv_LibapxPlayer[user].keyNumPadDivide == true && KeypressTimerCheck("key_numpadmultiply")){
+            Wait(KeypressTimer("key_numpadmultiply"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPadDivide == true){
+            LibapxUnitKeypressCheck("key_numpadmultiply",gv_LibapxPlayer[user].keyNumPadDivide);
+            }
+        }
+    }
+   if( EventKeyPressed() == c_keyNumPadDecimal ) {
+        gv_LibapxPlayer[user].keyNumPadDecimal = true;
+        LibapxUnitKeypressCheck("key_numpaddivide",gv_LibapxPlayer[user].keyNumPadDecimal);
+        while(gv_LibapxPlayer[user].keyNumPadDecimal == true && KeypressTimerCheck("key_numpaddivide")){
+            Wait(KeypressTimer("key_numpaddivide"),c_timeGame);
+            if(gv_LibapxPlayer[user].keyNumPadDecimal == true){
+            LibapxUnitKeypressCheck("key_numpaddivide",gv_LibapxPlayer[user].keyNumPadDecimal);
+            }
+        }
+    }
+
+
+
+
+
 	return true;
 }
-
+// New plan, change the LibapxUnitKeypressUpCheck() params so that it accepts the key of choice here
+//so that it follows the same rules as keyDown 
 bool LibapxKeyPressedUp(bool testConds, bool runActions) {
 	int user = EventPlayer();
+	unit u = EventUnit();
+
+
+    // if( EventKeyPressed() == c_keyEscape ) {
+	// 	gv_LibapxPlayer[user].c_keyEscape = false;
+	// 	LibapxUnitKeypressUpCheck("keyUp_escape");
+	// }
+    if( EventKeyPressed() == c_mouseButtonRight ) {
+		gv_LibapxPlayer[user].mouseRight = false;
+		LibapxUnitKeypressUpCheck("keyUp_control");
+	}
+	if( EventKeyPressed() == c_mouseButtonLeft ) {
+		gv_LibapxPlayer[user].mouseLeft = false;
+		LibapxUnitKeypressUpCheck("keyUp_alt");
+	}
+	if( EventKeyPressed() == c_mouseButtonMiddle ) {
+		gv_LibapxPlayer[user].mouseMiddle = false;
+		LibapxUnitKeypressUpCheck("keyUp_tab");
+
+	}
 	if( EventKeyPressed() == c_keyControl ) {
 		gv_LibapxPlayer[user].keyCtrl = false;
+		LibapxUnitKeypressUpCheck("keyUp_control");
 	}
 	if( EventKeyPressed() == c_keyAlt ) {
 		gv_LibapxPlayer[user].keyAlt = false;
+		LibapxUnitKeypressUpCheck("keyUp_alt");
 	}
 	if( EventKeyPressed() == c_keyTab ) {
 		gv_LibapxPlayer[user].keyTab = false;
+		LibapxUnitKeypressUpCheck("keyUp_tab");
+
 	}
 	if( EventKeyPressed() == c_keyShift ) {
 		gv_LibapxPlayer[user].keyShift = false;
+		LibapxUnitKeypressUpCheck("keyUp_shift");
+
 	}
 	if( EventKeyPressed() == c_keyGrave) {
-		gv_LibapxPlayer[user].keyGrave = false;
-	}
-	if( EventKeyPressed() == c_key0 ) {
-		gv_LibapxPlayer[user].key_0 = false;
-	}
-	if( EventKeyPressed() == c_key1 ) {
-		gv_LibapxPlayer[user].key_1 = false;
-	}
-	if( EventKeyPressed() == c_key2 ) {
-		gv_LibapxPlayer[user].key_2 = false;
-	}
-	if( EventKeyPressed() == c_key3 ) {
-		gv_LibapxPlayer[user].key_3 = false;
-	}
-	if( EventKeyPressed() == c_key4 ) {
-		gv_LibapxPlayer[user].key_4 = false;
-	}
-	if( EventKeyPressed() == c_key5 ) {
-		gv_LibapxPlayer[user].key_5 = false;
-	}
-	if( EventKeyPressed() == c_key6 ) {
-		gv_LibapxPlayer[user].key_6 = false;
-	}
-	if( EventKeyPressed() == c_key7 ) {
-		gv_LibapxPlayer[user].key_7 = false;
-	}
-	if( EventKeyPressed() == c_key8 ) {
-		gv_LibapxPlayer[user].key_8 = false;
-	}
-	if( EventKeyPressed() == c_key9 ) {
-		gv_LibapxPlayer[user].key_9 = false;
-	}
-	if( EventKeyPressed() == c_keyA ) {
-		gv_LibapxPlayer[user].keyA = false;
-	}
-	if( EventKeyPressed() == c_keyB ) {
-		gv_LibapxPlayer[user].keyB = false;
-	}
-	if( EventKeyPressed() == c_keyC ) {
-		gv_LibapxPlayer[user].keyC = false;
-	}
-	if( EventKeyPressed() == c_keyD ) {
-		gv_LibapxPlayer[user].keyD = false;
-	}
-	if( EventKeyPressed() == c_keyE ) {
-		gv_LibapxPlayer[user].keyE = false;
-	}
-	if( EventKeyPressed() == c_keyF ) {
-		gv_LibapxPlayer[user].keyF = false;
-	}
-	if( EventKeyPressed() == c_keyG ) {
-		gv_LibapxPlayer[user].keyG = false;
-	}
-	if( EventKeyPressed() == c_keyH ) {
-		gv_LibapxPlayer[user].keyH = false;
-	}
-	if( EventKeyPressed() == c_keyI ) {
-		gv_LibapxPlayer[user].keyI = false;
-	}
-	if( EventKeyPressed() == c_keyJ ) {
-		gv_LibapxPlayer[user].keyJ = false;
-	}
-	if( EventKeyPressed() == c_keyK ) {
-		gv_LibapxPlayer[user].keyK = false;
-	}
-	if( EventKeyPressed() == c_keyL ) {
-		gv_LibapxPlayer[user].keyL = false;
-	}
-	if( EventKeyPressed() == c_keyM ) {
-		gv_LibapxPlayer[user].keyM = false;
-	}
-	if( EventKeyPressed() == c_keyN ) {
-		gv_LibapxPlayer[user].keyN = false;
-	}
-	if( EventKeyPressed() == c_keyO ) {
-		gv_LibapxPlayer[user].keyO = false;
-	}
-	if( EventKeyPressed() == c_keyP ) {
-		gv_LibapxPlayer[user].keyP = false;
-	}
-	if( EventKeyPressed() == c_keyQ ) {
-		gv_LibapxPlayer[user].keyQ = false;
-	}
-	if( EventKeyPressed() == c_keyR ) {
-		gv_LibapxPlayer[user].keyR = false;
-	}
-	if( EventKeyPressed() == c_keyS ) {
-		gv_LibapxPlayer[user].keyS = false;
-	}
-	if( EventKeyPressed() == c_keyT ) {
-		gv_LibapxPlayer[user].keyT = false;
-	}
-	if( EventKeyPressed() == c_keyU ) {
-		gv_LibapxPlayer[user].keyU = false;
-	}
-	if( EventKeyPressed() == c_keyV ) {
-		gv_LibapxPlayer[user].keyV = false;
-	}
-	if( EventKeyPressed() == c_keyW ) {
-		gv_LibapxPlayer[user].keyW = false;
-	}
-	if( EventKeyPressed() == c_keyX ) {
-		gv_LibapxPlayer[user].keyX = false;
-	}
-	if( EventKeyPressed() == c_keyY ) {
-		gv_LibapxPlayer[user].keyY = false;
-	}
-	if( EventKeyPressed() == c_keyZ ) {
-		gv_LibapxPlayer[user].keyZ = false;
-	}
-	if( EventKeyPressed() == c_keyUp ) {
-		gv_LibapxPlayer[user].keyUp = false;
-	}
-	if( EventKeyPressed() == c_keyDown ) {
-		gv_LibapxPlayer[user].keyDown = false;
-	}
-	if( EventKeyPressed() == c_keyLeft ) {
-		gv_LibapxPlayer[user].keyLeft = false;
-	}
-	if( EventKeyPressed() == c_keyRight ) {
-		gv_LibapxPlayer[user].keyRight = false;
-	}
-	if( EventKeyPressed() == c_keyPageUp ) {
-		gv_LibapxPlayer[user].keyPgUp = false;
-	}
-	if( EventKeyPressed() == c_keyPageDown ) {
-		gv_LibapxPlayer[user].keyPgDown = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad0 ) {
-		gv_LibapxPlayer[user].keyNumPad0 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad1 ) {
-		gv_LibapxPlayer[user].keyNumPad1 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad2 ) {
-		gv_LibapxPlayer[user].keyNumPad2 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad3 ) {
-		gv_LibapxPlayer[user].keyNumPad3 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad4 ) {
-		gv_LibapxPlayer[user].keyNumPad4 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad5 ) {
-		gv_LibapxPlayer[user].keyNumPad5 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad6 ) {
-		gv_LibapxPlayer[user].keyNumPad6 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad7 ) {
-		gv_LibapxPlayer[user].keyNumPad7 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad8 ) {
-		gv_LibapxPlayer[user].keyNumPad8 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPad9 ) {
-		gv_LibapxPlayer[user].keyNumPad9 = false;
-	}
-	if( EventKeyPressed() == c_keyNumPadPlus ) {
-		gv_LibapxPlayer[user].keyNumPadPlus = false;
-	}
-	if( EventKeyPressed() == c_keyNumPadMultiply ) {
-		gv_LibapxPlayer[user].keyNumPadMultiply = false;
-	}
-	if( EventKeyPressed() == c_keyNumPadDivide ) {
-		gv_LibapxPlayer[user].keyNumPadDivide = false;
-	}
-	if( EventKeyPressed() == c_keyNumPadDecimal ) {
-		gv_LibapxPlayer[user].keyNumPadDecimal = false;
-	}
-
+        gv_LibapxPlayer[user].keyGrave = false;
+        LibapxUnitKeypressUpCheck("keyUp_grave");
+    }
+    if( EventKeyPressed() == c_key0 ) {
+        gv_LibapxPlayer[user].key_0 = false;
+        LibapxUnitKeypressUpCheck("keyUp_0");
+    }
+    if( EventKeyPressed() == c_key1 ) {
+        gv_LibapxPlayer[user].key_1 = false;
+        LibapxUnitKeypressUpCheck("keyUp_1");
+    }
+    if( EventKeyPressed() == c_key2 ) {
+        gv_LibapxPlayer[user].key_2 = false;
+        LibapxUnitKeypressUpCheck("keyUp_2");
+    }
+    if( EventKeyPressed() == c_key3 ) {
+        gv_LibapxPlayer[user].key_3 = false;
+        LibapxUnitKeypressUpCheck("keyUp_3");
+    }
+    if( EventKeyPressed() == c_key4 ) {
+        gv_LibapxPlayer[user].key_4 = false;
+        LibapxUnitKeypressUpCheck("keyUp_4");
+    }
+    if( EventKeyPressed() == c_key5 ) {
+        gv_LibapxPlayer[user].key_5 = false;
+        LibapxUnitKeypressUpCheck("keyUp_5");
+    }
+    if( EventKeyPressed() == c_key6 ) {
+        gv_LibapxPlayer[user].key_6 = false;
+        LibapxUnitKeypressUpCheck("keyUp_6");
+    }
+    if( EventKeyPressed() == c_key7 ) {
+        gv_LibapxPlayer[user].key_7 = false;
+        LibapxUnitKeypressUpCheck("keyUp_7");
+    }
+    if( EventKeyPressed() == c_key8 ) {
+        gv_LibapxPlayer[user].key_8 = false;
+        LibapxUnitKeypressUpCheck("keyUp_8");
+    }
+    if( EventKeyPressed() == c_key9 ) {
+        gv_LibapxPlayer[user].key_9 = false;
+        LibapxUnitKeypressUpCheck("keyUp_9");
+    }
+    if( EventKeyPressed() == c_keyA ) {
+        gv_LibapxPlayer[user].keyA = false;
+        LibapxUnitKeypressUpCheck("keyUp_a");
+    }
+    if( EventKeyPressed() == c_keyB ) {
+        gv_LibapxPlayer[user].keyB = false;
+        LibapxUnitKeypressUpCheck("keyUp_b");
+    }
+    if( EventKeyPressed() == c_keyC ) {
+        gv_LibapxPlayer[user].keyC = false;
+        LibapxUnitKeypressUpCheck("keyUp_c");
+    }
+    if( EventKeyPressed() == c_keyD ) {
+        gv_LibapxPlayer[user].keyD = false;
+        LibapxUnitKeypressUpCheck("keyUp_d");
+    }
+    if( EventKeyPressed() == c_keyE ) {
+        gv_LibapxPlayer[user].keyE = false;
+        LibapxUnitKeypressUpCheck("keyUp_e");
+    }
+    if( EventKeyPressed() == c_keyF ) {
+        gv_LibapxPlayer[user].keyF = false;
+        LibapxUnitKeypressUpCheck("keyUp_f");
+    }
+    if( EventKeyPressed() == c_keyG ) {
+        gv_LibapxPlayer[user].keyG = false;
+        LibapxUnitKeypressUpCheck("keyUp_g");
+    }
+    if( EventKeyPressed() == c_keyH ) {
+        gv_LibapxPlayer[user].keyH = false;
+        LibapxUnitKeypressUpCheck("keyUp_h");
+    }
+    if( EventKeyPressed() == c_keyI ) {
+        gv_LibapxPlayer[user].keyI = false;
+        LibapxUnitKeypressUpCheck("keyUp_i");
+    }
+    if( EventKeyPressed() == c_keyJ ) {
+        gv_LibapxPlayer[user].keyJ = false;
+        LibapxUnitKeypressUpCheck("keyUp_j");
+    }
+    if( EventKeyPressed() == c_keyK ) {
+        gv_LibapxPlayer[user].keyK = false;
+        LibapxUnitKeypressUpCheck("keyUp_k");
+    }
+    if( EventKeyPressed() == c_keyL ) {
+        gv_LibapxPlayer[user].keyL = false;
+        LibapxUnitKeypressUpCheck("keyUp_l");
+    }
+    if( EventKeyPressed() == c_keyM ) {
+        gv_LibapxPlayer[user].keyM = false;
+        LibapxUnitKeypressUpCheck("keyUp_m");
+    }
+    if( EventKeyPressed() == c_keyN ) {
+        gv_LibapxPlayer[user].keyN = false;
+        LibapxUnitKeypressUpCheck("keyUp_n");
+    }
+    if( EventKeyPressed() == c_keyO ) {
+        gv_LibapxPlayer[user].keyO = false;
+        LibapxUnitKeypressUpCheck("keyUp_o");
+    }
+    if( EventKeyPressed() == c_keyP ) {
+        gv_LibapxPlayer[user].keyP = false;
+        LibapxUnitKeypressUpCheck("keyUp_p");
+    }
+    if( EventKeyPressed() == c_keyQ ) {
+        gv_LibapxPlayer[user].keyQ = false;
+        LibapxUnitKeypressUpCheck("keyUp_q");
+    }
+    if( EventKeyPressed() == c_keyR ) {
+        gv_LibapxPlayer[user].keyR = false;
+        LibapxUnitKeypressUpCheck("keyUp_r");
+    }
+    if( EventKeyPressed() == c_keyS ) {
+        gv_LibapxPlayer[user].keyS = false;
+        LibapxUnitKeypressUpCheck("keyUp_s");
+    }
+    if( EventKeyPressed() == c_keyT ) {
+        gv_LibapxPlayer[user].keyT = false;
+        LibapxUnitKeypressUpCheck("keyUp_t");
+    }
+    if( EventKeyPressed() == c_keyU ) {
+        gv_LibapxPlayer[user].keyU = false;
+        LibapxUnitKeypressUpCheck("keyUp_u");
+    }
+    if( EventKeyPressed() == c_keyV ) {
+        gv_LibapxPlayer[user].keyV = false;
+        LibapxUnitKeypressUpCheck("keyUp_v");
+    }
+    if( EventKeyPressed() == c_keyW ) {
+        gv_LibapxPlayer[user].keyW = false;
+        LibapxUnitKeypressUpCheck("keyUp_w");
+    }
+    if( EventKeyPressed() == c_keyX ) {
+        gv_LibapxPlayer[user].keyX = false;
+        LibapxUnitKeypressUpCheck("keyUp_x");
+    }
+    if( EventKeyPressed() == c_keyY ) {
+        gv_LibapxPlayer[user].keyY = false;
+        LibapxUnitKeypressUpCheck("keyUp_y");
+    }
+    if( EventKeyPressed() == c_keyZ ) {
+        gv_LibapxPlayer[user].keyZ = false;
+        LibapxUnitKeypressUpCheck("keyUp_z");
+    }
+    if( EventKeyPressed() == c_keyUp ) {
+        gv_LibapxPlayer[user].keyUp = false;
+        LibapxUnitKeypressUpCheck("keyUp_up");
+    }
+    if( EventKeyPressed() == c_keyDown ) {
+        gv_LibapxPlayer[user].keyDown = false;
+        LibapxUnitKeypressUpCheck("keyUp_down");
+    }
+    if( EventKeyPressed() == c_keyLeft ) {
+        gv_LibapxPlayer[user].keyLeft = false;
+        LibapxUnitKeypressUpCheck("keyUp_left");
+    }
+    if( EventKeyPressed() == c_keyRight ) {
+        gv_LibapxPlayer[user].keyRight = false;
+        LibapxUnitKeypressUpCheck("keyUp_right");
+    }
+    if( EventKeyPressed() == c_keyPageUp ) {
+        gv_LibapxPlayer[user].keyPgUp = false;
+        LibapxUnitKeypressUpCheck("keyUp_pgup");
+    }
+    if( EventKeyPressed() == c_keyPageDown ) {
+        gv_LibapxPlayer[user].keyPgDown = false;
+        LibapxUnitKeypressUpCheck("keyUp_pgdown");
+    }
+    if( EventKeyPressed() == c_keyNumPad0 ) {
+        gv_LibapxPlayer[user].keyNumPad0 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad0");
+    }
+    if( EventKeyPressed() == c_keyNumPad1 ) {
+        gv_LibapxPlayer[user].keyNumPad1 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad1");
+    }
+    if( EventKeyPressed() == c_keyNumPad2 ) {
+        gv_LibapxPlayer[user].keyNumPad2 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad2");
+    }
+    if( EventKeyPressed() == c_keyNumPad3 ) {
+        gv_LibapxPlayer[user].keyNumPad3 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad3");
+    }
+    if( EventKeyPressed() == c_keyNumPad4 ) {
+        gv_LibapxPlayer[user].keyNumPad4 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad4");
+    }
+    if( EventKeyPressed() == c_keyNumPad5 ) {
+        gv_LibapxPlayer[user].keyNumPad5 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad5");
+    }
+    if( EventKeyPressed() == c_keyNumPad6 ) {
+        gv_LibapxPlayer[user].keyNumPad6 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad6");
+    }
+    if( EventKeyPressed() == c_keyNumPad7 ) {
+        gv_LibapxPlayer[user].keyNumPad7 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad7");
+    }
+    if( EventKeyPressed() == c_keyNumPad8 ) {
+        gv_LibapxPlayer[user].keyNumPad8 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad8");
+    }
+    if( EventKeyPressed() == c_keyNumPad9 ) {
+        gv_LibapxPlayer[user].keyNumPad9 = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpad9");
+    }
+    if( EventKeyPressed() == c_keyNumPadPlus ) {
+        gv_LibapxPlayer[user].keyNumPadPlus = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpadplus");
+    }
+    if( EventKeyPressed() == c_keyNumPadMultiply ) {
+        gv_LibapxPlayer[user].keyNumPadMultiply = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpadminus");
+    }
+    if( EventKeyPressed() == c_keyNumPadDivide ) {
+        gv_LibapxPlayer[user].keyNumPadDivide = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpadmultiply");
+    }
+    if( EventKeyPressed() == c_keyNumPadDecimal ) {
+        gv_LibapxPlayer[user].keyNumPadDecimal = false;
+        LibapxUnitKeypressUpCheck("keyUp_numpaddivide");
+    }
 	return true;
 }

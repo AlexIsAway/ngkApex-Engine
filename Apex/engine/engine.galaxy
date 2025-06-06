@@ -128,6 +128,16 @@ include "apex/engine/events/events.galaxy"
 // player usage of blacklist handled by blacklist in generalCommands
 include "apex/engine/blacklist.galaxy"
 
+// data_table_manager
+// =============
+// contains functions assisting with data tables, including creation, cleanup, deletion, and exists
+// Global data tables
+// Player related data tables
+// Unit related data tables
+include "apex/engine/data_table_manager.galaxy"
+
+
+
 
 // debug
 // =============
@@ -137,7 +147,7 @@ include "apex/engine/debug.galaxy"
 // engine version
 const int gv_LibapxBuildVersion = 2;
 const int gv_LibapxBuildSubVersion = 3;
-const string gv_LibapxBuildVersionModifier = ".2";
+const string gv_LibapxBuildVersionModifier = ".7";
 
 void LibapxEngineInitialize() {
 	int player = 1;

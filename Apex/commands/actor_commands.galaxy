@@ -91,6 +91,13 @@ void LibapxCommandActormessage(int user, unitgroup u, string argv, int spawningC
 	unitgroup p = u;
 	int colcheker = 1;
 	bool colFlag = false;
+	bool nocache = false;
+
+	if (StringContains(argv,"-nocache",c_stringAnywhere,c_stringNoCase)) {
+		nocache = true;
+		argv = StringReplaceWord(argv," -nocache","",1,c_stringNoCase);
+	}
+	
 	while (StringWord(argv, colcheker) != "") {
 		if(StringFind(StringWord(argv, colcheker), "colossus", c_stringNoCase) != -1 ) {
 				UnitGroupLoopBegin(p);
@@ -134,7 +141,7 @@ void LibapxCommandActormessage(int user, unitgroup u, string argv, int spawningC
 
 	if (StringWord(amsg,1) == "SetScale" || StringWord(amsg,1) == "SetScaleAbsolute") {
 
-		amsg = StringWord(amsg,1) +  " " + LibapxScalerapply(StringWord(amsg,2), u, "scale", user) + " " + StringWord(amsg,3);
+		amsg = StringWord(amsg,1) +  " " + LibapxScalerapply(StringWord(amsg,2), u, "scale", user) + " " + StringWord(amsg,3) + " " + StringWord(amsg,4); // @actrmsg SetScale 3 1.000000 Label;@actrmsg ClearScale 1.000000 Label
 	}
 	//LibapxScalerapply(offset)
 
@@ -145,7 +152,9 @@ void LibapxCommandActormessage(int user, unitgroup u, string argv, int spawningC
 		}
 		else {
 			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, amsg);
-			LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@actrmsg", argv);
+			if(!nocache) {
+				LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@actrmsg", argv);
+			}
 		}
 		UnitGroupLoopStep();
 	}
@@ -193,7 +202,7 @@ void LibapxDefineTarget(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
-		" Gives an actor a target or name to be used to point to this actor with another command, a target can also be used with this command. <br> @target ->target targetname <br> Examples: <br> @target 123;@attach marine origin 0 0 3;@scale ->123 3 3 3 <br> @target ->b 123 <br> <br> Extra Info: <br> You can remove a target by doing <br> @actrmsg ->targetyouwanttoremove AliasRemove ->targetyouwanttoremove "
+		" Gives an actor a target or name to be used to point to this actor with another command, a target can also be used with this command. <br> @target ->target targetname <br> Examples: <br> @target 123;@attach marine origin 0 0 3;@scale ->123 3 3 3 <br> @target ->b 123 <br> <br> Extra Info: <br> You can remove a target by doing <br> @actrmsg ->targetyouwanttoremove AliasRemove ->targetyouwanttoremove <br> @actrmsg ->::Main -nocache SetScale 2 1 Steven "
 	);
 }
 
@@ -215,6 +224,7 @@ void LibapxCommandScale(int user, unitgroup u, string argv, int spawningCount, s
 	string scale;
 	int paramOffset = 0;
 	string target = LibapxACTORREFMAIN;
+	string scaleLabel = ""; // This allows it to be cleared over a set duration using ClearScale. Giving a label allows multiple scales to stack on different labeled @scales (setscaler bypasses large numbers anyways). Example: @scale 2 2 2 1.00000 scaleLabel;@actrmsg ClearScale 1.000000 scaleLabel
 
 	// get actor reference target
 	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
@@ -227,6 +237,7 @@ void LibapxCommandScale(int user, unitgroup u, string argv, int spawningCount, s
 	paramY = StringWord(argv, 3 + paramOffset);
 	paramZ = StringWord(argv, 4 + paramOffset);
 	paramTime = StringWord(argv, 5 + paramOffset);
+	scaleLabel = StringWord(argv, 6 + paramOffset);
 
 	x = StringToFixed(paramX);
 	y = StringToFixed(paramY);
@@ -259,14 +270,14 @@ void LibapxCommandScale(int user, unitgroup u, string argv, int spawningCount, s
 
 
 	ApplyActormsg(u, target, argv, "@scale",
-						  "SetScale " + scale + " " + FixedToString(time, 3));
+						  "SetScale " + scale + " " + FixedToString(time, 3) + " " + scaleLabel);
 	return;
 }
 void LibapxDefineScale(string commandName) {
 	LibapxCommandsGuideEntrySet(
 		gv_CommandsGuideEntryActor, 
 		commandName, 
-		" Changes the scale of an actor. It can be used with target. <br> @scale ->target x y z timescale <br> Examples: <br> @scale 3 2 1 4 <br> @scale 3 <br> @target a;@attach marine head;@scale ->a 5 5 1 3  "
+		" Changes the scale of an actor. It can be used with target. <br> @scale ->target x y z timescale <br> Examples: <br> @scale 3 2 1 4 <br> @scale 3 <br> @target a;@attach marine head;@scale ->a 5 5 1 3 <br> @scale 3 3 3 0 Name;@actrmsg ClearScale 1.000000 Name "
 	);
 }
 
@@ -455,6 +466,8 @@ void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCoun
 	string amsg;
 	int paramOffset = 0;
 	string target = LibapxACTORREFMAIN;
+	bool nosplice = false;
+	string preventSplice = "";
 
 
 
@@ -475,6 +488,12 @@ void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCoun
 		colcheker = colcheker + 1;
 	}
 
+	if (StringContains(argv,"-nosplice",c_stringAnywhere,c_stringNoCase)) {
+		nosplice = true;
+		// 100 is arbitrary, variation will be randomized if the given number is larger than the model's max variant count
+		preventSplice = " {100} {PreventAllDynamicTextureTransfers}";
+	}
+
 
 
 
@@ -490,11 +509,12 @@ void LibapxCommandModelswap(int user, unitgroup u, string argv, int spawningCoun
 		LibapxPrintOutput(user, "<c val=\"ff0000\">Unable to swap model</c>: No such model exists.");
 		return;
 	}
-	amsg = "ModelSwap {" + model + "}";
+	amsg = "ModelSwap {" + model + "} " + preventSplice;
+	
 
 	variation = StringWord(argv, 3 + paramOffset);
-	if( variation != "" && StringToInt(variation) >= 0 ) {
-		amsg += " {" + variation + "}";
+	if( variation != "" && StringToInt(variation) >= 0 && variation != "-nosplice") {
+		amsg += " {" + variation + "}" + preventSplice;
 	}
 
 	ApplyActormsg(u, target, argv, "@modelswap", amsg);
@@ -869,6 +889,10 @@ void LibapxCommandAttachMinus(int user, unitgroup u, string argv, int spawningCo
 			libNtve_gf_AttachActorToUnit(UnitGroupLoopCurrent(), actr, apoint);
 			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
 					LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@attach-", argv);
+					LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),"->::Main",apoint,"0","0,0,0","0,0,0","");
+					//Reset for @rotator
+					ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Current", "AliasRemove Apex_Attach_Current");
+					ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant");
 			}
 			UnitGroupLoopStep();
 		}
@@ -899,6 +923,7 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 	string scope;
 	string apoint;
 	string apointIndex = "";
+	string lastAttachPoint;
 	string offset = null;
 	string rotation = null;
 	string SOp;
@@ -909,6 +934,13 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 	unitgroup p = u;
 	int colcheker = 1;
 	bool nocache;
+	bool noDelay; //Secret modifier, dont tell anyone. This negates all delays in cmd (for adjuster)
+
+	if(StringFind( argv, "-nodelay",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, "-nodelay", "", 1, c_stringNoCase);
+		noDelay = true;
+	}
+
 	if( StringFind(argv, "-nocache" ,c_stringNoCase) != -1 ) {
 		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
 		LibapxPrintOutput(user, argv);
@@ -925,7 +957,10 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 		}
 		colcheker = colcheker + 1;
 	}
-	LibapxWaitDelay(user);
+	if(!noDelay) {
+		//Wait
+		LibapxWaitDelay(user);
+	}
 	// get actor reference target
 	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
 		target = StringWord(argv, 2);
@@ -1074,7 +1109,13 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 
 	//FINALLY create the actor msg (before send)
 
-	actormsg = "AttachModelOffset " + actr + " " + model + " " + apoint;
+	actormsg = "AttachModelOffset " + actr + " " + model + " " + apoint; // "-ats","-ats head", "-ats Weapon_02"
+
+	lastAttachPoint = StringReplaceWord(apoint,"{","",1,c_stringCase);
+	lastAttachPoint = StringReplaceWord(lastAttachPoint,"}","",1,c_stringCase);
+	// LibapxPrintOutput(user, lastAttachPoint);
+
+
 	if(offset != null) {
 
 		offset = LibapxScalerapply(offset, u, "", user);
@@ -1087,13 +1128,30 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 		actormsg = actormsg + " " + siteops;
 	}
 
+
+
+
+	
 	// apply attach actor msg to units
 	if( StringSub(target, 1, 2) == "->" ) {
 		target = StringSub(target, 3, StringLength(target));
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
 			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, actormsg);
-
+			LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, StringWord(lastAttachPoint,1), StringWord(lastAttachPoint,2), offset, "0,0,0", siteops);
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Current", "AliasRemove Apex_Attach_Current");
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant");
+				DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated", "no");
+				DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Offsetted", "no");
+			if (offset == ""){
+				offset = "0,0,0";
+				LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, StringWord(lastAttachPoint,1), StringWord(lastAttachPoint,2), offset, "0,0,0", siteops); //Saving coordinates for @rotator
+				//Reset for @rotator
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Current", "AliasRemove Apex_Attach_Current");
+				ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant");
+				DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated", "no");
+				DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Offsetted", "no");
+			}
 			// TODO: need to generalize actors that shouldnt update cache
 			if(!StringContains(actr, "TalkIcon", c_stringAnywhere, c_stringNoCase)) {
 				if(!nocache) {
@@ -1109,6 +1167,12 @@ void LibapxCommandAttach(int user, unitgroup u, string argv, int spawningCount, 
 		UnitGroupLoopBegin(g);
 		while(!UnitGroupLoopDone()) {
 			ActorSend(ActorFrom(target), actormsg);
+			//Reset for @rotator
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Current", "AliasRemove Apex_Attach_Current");
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant");
+			LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, StringWord(lastAttachPoint,1), StringWord(lastAttachPoint,2), offset, "0,0,0", siteops); //Saving coordinates for @rotator
+			DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated", "no");
+			DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Offsetted", "no");
 			UnitGroupLoopStep();
 		}
 		UnitGroupLoopEnd();
@@ -1124,6 +1188,7 @@ void LibapxDefineAttach(string commandName) {
 }
 
 
+
 // LibapxCommandRotation
 // =====================
 //This command uses the "Apex_Rotator" model and actor with attachmodeloffset to achieve  x y and z rotations.
@@ -1134,18 +1199,21 @@ void LibapxDefineAttach(string commandName) {
 // -b  : switches actor to beacon scaled actor
 
 //Prototypes
-void attachRotationX(int degrees, bool absScale, unit u);
-void attachRotationY(int degrees, bool absScale, unit u);
-void attachRotationZ(int degrees, bool absScale, unit u);
+void attachRotationX(int degrees, bool absScale, unit u, bool Model);
+void attachRotationY(int degrees, bool absScale, unit u, bool Model);
+void attachRotationZ(int degrees, bool absScale, unit u, bool Model);
 
 void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	bool modYpr = false;
 	bool modB = false;
+	bool modM = false;
 	int i;
 	int j;
 	string temp;
 	bool nocache;
 	unit tmpUnit;
+	string presetCoords;
+
 	if(StringFind( argv, "-nocache",c_stringNoCase) != -1) {
 		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
 		nocache = true;
@@ -1161,6 +1229,43 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 		argv = StringReplaceWord(argv, "-b",  "", 1, c_stringNoCase);
 	} 
 
+	if( StringFind(argv, "-m", c_stringNoCase) != -1 ) {
+		modM = true;
+	} 
+
+	
+	if (modM) {
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated") != "yes"){
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant");
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "RefSet ::scope.Host ::Host");
+		} else {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant"); //all existing Apex_Attach actors becomes "Old"
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "RefSet ::scope.Host ::Host");
+		}
+
+		presetCoords = LibapxUnitGetLastAttachVal(UnitGroupLoopCurrent());
+
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Old", "AliasAdd Apex_Attach_Irrelevant"); //all existing Apex_Attach actors becomes "Old"
+		//Step Two: copy the attachment of the current actor, but instead with an Apex_Attach model actor
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "AttachModelOffset Apex_Attach Invisible Origin 0,0,0"); //attaching the apex_attach actor first
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_New", "RefSet ::scope.RotatorHost"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated") == "yes"){
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::scope.Host", "AttachOffset Apex_Attach_New " + presetCoords); 
+		} else {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::scope.Host", "AttachOffset Apex_Attach_New " + presetCoords); 
+		}
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+}
+
+
+	
 	//Strings-words start at 1
 	//1 = command
 	//2 = starting syntx
@@ -1173,7 +1278,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
 
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					 attachRotationZ(StringToInt(temp), !modB, UnitGroupUnit(u, j));
+					 attachRotationZ(StringToInt(temp), !modB, UnitGroupUnit(u, j), modM);
 				}
 			}
 			if (StringFind(temp, "p", c_stringNoCase) != -1) {
@@ -1181,7 +1286,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 				temp = StringReplace(temp, "", StringFind(temp, "p", c_stringNoCase), StringFind(temp, "p", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attachRotationY(StringToInt(temp), !modB, UnitGroupUnit(u, j));
+					attachRotationY(StringToInt(temp), !modB, UnitGroupUnit(u, j), modM);
 			   }
 			}
 			if (StringFind(temp, "r", c_stringNoCase) != -1) {
@@ -1189,7 +1294,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 				temp = StringReplace(temp, "", StringFind(temp, "r", c_stringNoCase), StringFind(temp, "r", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attachRotationX(StringToInt(temp), !modB, UnitGroupUnit(u, j));
+					attachRotationX(StringToInt(temp), !modB, UnitGroupUnit(u, j), modM);
 			   }
 			}
 		}
@@ -1199,7 +1304,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 				temp = StringReplace(temp, "", StringFind(temp, "x", c_stringNoCase), StringFind(temp, "x", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					 attachRotationX(StringToInt(temp), !modB, UnitGroupUnit(u, j));
+					 attachRotationX(StringToInt(temp), !modB, UnitGroupUnit(u, j), modM);
 				}
 				
 			}
@@ -1208,7 +1313,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 				temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attachRotationY(StringToInt(temp), !modB, UnitGroupUnit(u, j));
+					attachRotationY(StringToInt(temp), !modB, UnitGroupUnit(u, j), modM);
 			   }
 			}
 			if (StringFind(temp, "z", c_stringNoCase) != -1) {
@@ -1216,7 +1321,7 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 				temp = StringReplace(temp, "", StringFind(temp, "z", c_stringNoCase), StringFind(temp, "z", c_stringNoCase) );
 	
 				for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
-					attachRotationZ(StringToInt(temp), !modB, UnitGroupUnit(u, j));
+					attachRotationZ(StringToInt(temp), !modB, UnitGroupUnit(u, j), modM);
 			   }
 			}
 		}
@@ -1233,6 +1338,10 @@ void LibapxCommandAttachRotation(int user, unitgroup u, string argv, int spawnin
 	for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
 		if(!nocache) {
 			LibapxUnitCacheUpdate(UnitGroupUnit(u, j), "@rotation", argv);
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupUnit(u, j)),"Apex_Attach", "AliasAdd Apex_Attach_Current"); //now ALL Apex_Attach actors are labeled "Current" including most recent one.
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupUnit(u, j)),"Apex_Attach_Irrelevant", "AliasRemove Apex_Attach_Current"); //all "Irrelevant" actors discard the "Current" label EXCEPT the most recent added
+			DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupUnit(u, j), gv_LibapxUnitIndexId), 0) + "_Rotated", "yes");
+			DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupUnit(u, j), gv_LibapxUnitIndexId), 0) + "_Offsetted", "no");
 		}
 
 	}
@@ -1246,7 +1355,7 @@ void LibapxDefineRotation(string commandName) {
 	);
 }
 //Helper commands for rotation
-void attachRotationX(int degrees, bool absScale, unit u) {
+void attachRotationX(int degrees, bool absScale, unit u, bool Model) {
 	int pointNum;
 	string attachPoint = "";
 	string rotation = "0,0,0";
@@ -1258,6 +1367,10 @@ void attachRotationX(int degrees, bool absScale, unit u) {
 	if(absScale) {
 		actorName = "Apex_Actor";
 	}
+	if(Model) {
+        actorName = "Apex_Attach";
+    }
+	
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
 	}
@@ -1286,16 +1399,34 @@ void attachRotationX(int degrees, bool absScale, unit u) {
 		rotation = "0,-1,-" + FixedToString(Tan(degrees),9);
 	}
 
+	if (Model) {
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" {} Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelSwap Apex_Rotator");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "SetScaleAbsolute 1");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelAllowHitTest 0");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //Again
+		//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" Invisible " + attachPoint + " 0,0,0 " + rotation); 
+		//repeat process
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachOffset ::Main {Origin 0} 0,0,0");
+	} else {
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
+		//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
+	}
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
-	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
-	attachRotationZ(270, absScale, u);
+	attachRotationZ(270, absScale, u, Model);
+
 }
 
-void attachRotationZ(int degrees, bool absScale, unit u) {
+void attachRotationZ(int degrees, bool absScale, unit u, bool Model) {
 	int pointNum;
 	string attachPoint = "";
 	string rotation = "0,0,0";
@@ -1307,6 +1438,9 @@ void attachRotationZ(int degrees, bool absScale, unit u) {
 	if(absScale) {
 		actorName = "Apex_Actor";
 	}
+	if(Model) {
+        actorName = "Apex_Attach";
+    }
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
 	}
@@ -1338,13 +1472,31 @@ void attachRotationZ(int degrees, bool absScale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
-	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
+
+	if (Model) {
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" {} Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelSwap Apex_Rotator");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "SetScaleAbsolute 1");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelAllowHitTest 0");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //Again
+		//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" Invisible " + attachPoint + " 0,0,0 " + rotation); 
+		//repeat process
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachOffset ::Main {Origin 0} 0,0,0");
+	} else {
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
+		//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
+	}
 }
-void attachRotationY(int degrees, bool absScale, unit u) {
+void attachRotationY(int degrees, bool absScale, unit u, bool Model) {
 	int pointNum;
 	string attachPoint = "";
 	string rotation = "0,0,0";
@@ -1356,6 +1508,9 @@ void attachRotationY(int degrees, bool absScale, unit u) {
 	if(absScale) {
 		actorName = "Apex_Actor";
 	}
+	if(Model) {
+        actorName = "Apex_Attach";
+    }
 	while(degreesAbs > 360 || degreesAbs == 360) {
 		degreesAbs -= 360;
 	}
@@ -1387,9 +1542,825 @@ void attachRotationY(int degrees, bool absScale, unit u) {
 	}
 
 
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
-	//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
-	ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
+
+	if (Model) {
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" {} Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelSwap Apex_Rotator");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "SetScaleAbsolute 1");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelAllowHitTest 0");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //Again
+		//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" Invisible " + attachPoint + " 0,0,0 " + rotation); 
+		//repeat process
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachOffset ::Main {Origin 0} 0,0,0");
+	} else {
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelSwap Apex_Rotator");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "SetScaleAbsolute 1");
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "ModelAllowHitTest 0");
+		//AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+		ActorSendTo(libNtve_gf_MainActorofUnit(u),"::Main", "AttachModelOffset "+actorName+" {} " + attachPoint + " 0,0,0 " + rotation);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// LibapxCommandOffset
+// =====================
+// Offsets the ::Main actor by default off the actor it's currently hosted by
+// Can optionally specify attachpoints, coordinate offsets, coordinate rotations, (and site operations??)
+// syntax: @offset (->[ref]) [Point_#] [offX] [offY] [offZ] [rotX] [rotY] [rotZ] [SOp1] [SOp2] [SOp3]...
+void LibapxCommandOffset(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	unitgroup g = u;
+	int parseOffset = 0;
+	int x;
+	string actr = "{}";
+	string model = "{}";
+	string scope;
+	string apoint;
+	string apointIndex = "";
+	string offset = null;
+	string rotation = null;
+	string SOp;
+	string siteops = "";
+	string actormsg;
+	string attachPoints = "Origin Center Damage Engine Hardpoint Head Hit Overhead RallyPoint StatusBar Left Right Target Turret TurretY TurretZ Upgrade Weapon WeaponLeft WeaponRight Left Right Attacher";
+	string presetCoords;
+	unitgroup p = u;
+	int colcheker = 1;
+	bool nocache;
+	bool noDelay; //Secret modifier, dont tell anyone. This negates all delays in cmd (for adjuster)
+
+	fixed scaler = gv_LibapxPlayer[user].scaler;
+	 //I think Sero fucking uses this for x,y,z for some reason. 
+	// use attachPoints to noCaseSensitive common points. Otherwise use the input as is.
+	string attPoint = StringWord(argv,2);
+	string attPointNum = StringWord(argv,3);
+	 //Actually we're going to try the string sub or replace to shift the input offset for attpointnum. If no underscore, then will not take a attach point input.
+	// set the offsets to 0,0,0 if none are given also have it give the exact argv if setscaler isn't 1.
+	string offsetX = null;
+	string offsetY = null;
+	string offsetZ = null;
+	// set the rotations to 0,0,0 if none are given
+	string rotX = null;
+	string rotY = null;
+	string rotZ = null;
+	// string target = LibapxACTORREFMAIN;
+	string target = "->::Host";
+	string val;
+	int paramOffset;
+	string siteOps = LibapxBracketTextGrab(bracketText, 1);
+
+
+	// Correct all SiteOps in bracketText
+	if(StringWord(siteOps,1) != "") {
+		x = 0;
+		while(StringWord(siteOps,1 + x) != "") {
+			SOp = StringWord(siteOps,1 + x);
+			SOp = LibapxCatalogGet(c_gameCatalogActor, SOp);
+			if(SOp == null) {
+				LibapxPrintOutput(user, "<c val=\"ff0000\">Warning: Encounted invalid or unknown Site Op: Skipping");
+								
+			} else {
+				siteOps = StringReplaceWord(siteOps,StringWord(siteOps,1 + x),SOp,c_stringReplaceAll,c_stringNoCase);
+			}
+			x += 1;
+		}
+	}
+
+	
+	// Sets the paramoffets if ->::Target is detected
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
+		target = StringWord(argv, 2);
+		paramOffset = 1;
+	}
+	val = StringWord(argv, 2 + paramOffset);
+	val = StringCase(StringSub(val, 1, 1), true) + StringSub(val, 2, StringLength(val));
+
+
+	// Compatability with some of the original AttachOffset formatting, (eg. 0.05,1,20 = 0.05 1 20)
+	argv = StringReplaceWord(argv,","," ",4,c_stringNoCase);
+
+
+	// Sets the attach point number to the 2nd part of the first argument (eg. Weapon_02 = "Weapon")
+	attPoint = StringWord(StringReplaceWord(StringWord(argv,2 + paramOffset),"_"," ",1,c_stringNoCase),1);
+
+
+	// Predetermined attach points gets no-case-sensitivity benefits :)
+	x = 1;
+	while( StringWord(attachPoints, x) != "" ) {
+		if( StringEqual(attPoint, StringWord(attachPoints, x), false) ) {
+			attPoint = StringWord(attachPoints, x);
+			x = -1;
+			break;
+		}
+		x = x + 1;
+	}
+
+
+	// Sets the attach point number to the second part of the first argument (eg. Weapon_02 = "02") else defaults zero.
+	if (StringContains(StringWord(argv,2 + paramOffset),"_",c_stringAnywhere,c_stringNoCase)) {
+		attPointNum = StringWord(StringReplaceWord(StringWord(argv,2 + paramOffset),"_"," ",1,c_stringNoCase),2);
+	} else {
+		attPointNum = "0";
+	}
+
+
+	// Sets the arguement offsets
+	offsetX = StringWord(argv,3 + paramOffset);
+	offsetY = StringWord(argv,4 + paramOffset);
+	offsetZ = StringWord(argv,5 + paramOffset);
+	rotX = StringWord(argv,6 + paramOffset);
+	rotY = StringWord(argv,7 + paramOffset);
+	rotZ = StringWord(argv,8 + paramOffset);
+
+
+	// Sets the defaults
+	if(attPoint ==""){
+		attPoint = "Origin";
+	}
+	if(attPointNum ==""){
+		attPointNum = "0";
+	}
+	if(offsetX ==""){
+		offsetX = "0";
+	}
+	if(offsetY ==""){
+		offsetY = "0";
+	}
+	if(offsetZ ==""){
+		offsetZ = "0";
+	}
+	if(rotX ==""){
+		rotX = "0";
+	}
+	if(rotY ==""){
+		rotY = "0";
+	}
+	if(rotZ ==""){
+		rotZ = "0";
+	}
+
+
+	//idk these might become features
+	if(StringFind( argv, "-nodelay",c_stringNoCase) != -1) {
+		argv =  StringReplaceWord(argv, "-nodelay", "", 1, c_stringNoCase);
+		noDelay = true;
+	}
+	if( StringFind(argv, "-nocache" ,c_stringNoCase) != -1 ) {
+		argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
+		LibapxPrintOutput(user, argv);
+		nocache = true;
+	}
+	if(!noDelay) {
+		//Wait
+		LibapxWaitDelay(user);
+	}
+
+
+	// Reapplies commas for the actual actrsmg syntax
+	offset = offsetX + "," + offsetY  + "," + offsetZ;
+	offset = LibapxScalerapply(offset, u, "", user); //Applies scaler. Might be broken.
+
+
+	// actormsg = "->" + target + "AttachOffset ::Main {Head 0} 0,0,0 0,0,0";
+	actormsg = "AttachOffset ::Main {"+ attPoint +" "+ attPointNum +"} " + offset + " " + rotX + "," + rotY + "," + rotZ + " {" + siteOps + "}" ;
+
+
+	  //basically the only way I can get it to save a setscaler'd offset 
+	 // scratch that, it's so dumb. Attach/Attach-/Scale don't actually cache the manipulated offset values
+	//  i misremembered the fact that my reposition alias uses variables, which DO save scaled values. :/
+	// if (scaler != 1){
+	// argv = StringReplaceWord(argv, offsetX + " " + offsetY + " " + offsetZ, offset, 1, c_stringCase);
+	// }
+
+
+	// Actual Function 
+	if( StringSub(target, 1, 2) == "->" ) {
+		target = StringSub(target, 3, StringLength(target));
+	UnitGroupLoopBegin(g);
+		while(!UnitGroupLoopDone()) {
+			presetCoords = LibapxUnitGetLastAttachVal(UnitGroupLoopCurrent());
+			
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()), target, actormsg);
+			DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Offsetted", "yes");
+			if (bracketText != "") {
+				LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@offset", argv + " [" + siteOps + "]"); // if there are SOps
+				if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated") == "yes"){ 
+					LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, StringReplaceWord(StringWord(presetCoords,1),"{","",1,c_stringNoCase), attPointNum, offset, rotX + "," + rotY + "," + rotZ , siteOps); //Saving coordinates for @rotator
+				} else {
+					LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, attPoint, attPointNum, offset, rotX + "," + rotY + "," + rotZ , siteOps);
+				}
+			} else {
+				LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@offset", argv); // else without SOps
+				if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated") == "yes"){ 
+					LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, StringReplaceWord(StringWord(presetCoords,1),"{","",1,c_stringNoCase), attPointNum, offset, rotX + "," + rotY + "," + rotZ , siteOps); //Saving coordinates for @rotator
+				} else {
+					LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, attPoint, attPointNum, offset, rotX + "," + rotY + "," + rotZ , siteOps);
+				}
+			}
+			UnitGroupLoopStep();
+			// LibapxPrintOutput(user, target + actormsg);
+		}
+		UnitGroupLoopEnd();
+	} else { // "__[ref]", target global
+	target = StringSub(target, 3, StringLength(target));
+	UnitGroupLoopBegin(g);
+	while(!UnitGroupLoopDone()) {
+		ActorSend(ActorFrom(target), actormsg);
+		LibapxUnitCacheUpdate(UnitGroupLoopCurrent(), "@offset", argv);
+		LibapxUnitSetLastAttachVal(UnitGroupLoopCurrent(),target, attPoint, attPointNum, offset, rotX + "," + rotY + "," + rotZ , siteOps); //Saving coordinates for @rotator
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+
+	
+}
+return;
+
+
+}
+void LibapxDefineOffset(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryActor, 
+		commandName, 
+		" This command repositions the current actor to its host/attaching actor. It is compatible with target. <br> @offset ->[target] [point] [number(optional)] [x] [y] [z] [x] [y] [z] [[SOp....]] <br> To Note: The second set of x y z represents what coordinates the actor should face on a cartesian plane. <br> Also Note: syntax is compatible with original comma separators. <br> You can find a list of valid attachpoints with @attach listpoints  <br> the first [x] [y] [z] is how you attach a model with an offset <br> can insert any number of SOp's in brackets []'s. <br> Examples: <br> (This would reposition the current actor 3 units ahead of where you attach.) <br> @offset origin 0 -3 0 <br> @offset target_02 [sop90] <br> (This would make the current attached actor rotate forwards 45 degrees) <br> @offset origin 0,0,0 0,-1,-1"
+	);
+}
+
+// LibapxCommandRotator
+// =====================
+//This command uses the "Apex_Attach" model and actor with attachmodeloffset to achieve  x y and z rotations.
+// I do not want to override the @rotation cmd so duplicating will have to do for now.
+// ex. @rotator 21x
+// @rotator 11y 37x
+
+//Prototypes
+void attachRotatorX(int degrees, bool absScale, unit u, bool modelAttach);
+void attachRotatorY(int degrees, bool absScale, unit u, bool modelAttach);
+void attachRotatorZ(int degrees, bool absScale, unit u, bool modelAttach);
+
+void LibapxCommandNewAttachRotation(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+    bool modYpr = false;
+    bool modB = false;
+    int i;
+    int j;
+    string temp;
+	string presetCoords;
+    bool nocache;
+    bool useModel;
+    unit tmpUnit;
+    if(StringFind( argv, "-nocache",c_stringNoCase) != -1) {
+        argv =  StringReplaceWord(argv, "-nocache", "", 1, c_stringNoCase);
+        nocache = true;
+    }
+    if(StringFind( argv, "-m",c_stringNoCase) != -1) {
+        argv =  StringReplaceWord(argv, "-m", "", 1, c_stringNoCase);
+        useModel = true;
+    }
+    //Remove, and check for, modifiers.
+    if( StringFind(argv, "-ypr", c_stringNoCase) != -1 ) {
+        modYpr = true;
+        argv = StringReplaceWord(argv, "-ypr",  "", 1, c_stringNoCase);
+    } 
+
+    if( StringFind(argv, "-b", c_stringNoCase) != -1 ) {
+        modB = true;
+        argv = StringReplaceWord(argv, "-b",  "", 1, c_stringNoCase);
+    } 
+
+
+
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		//Starting by making all older ones irrelevant by default.
+		// ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "HaloStart"); //TEST
+
+		if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated") != "yes"){
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "RefSet ::scope.Host ::Host");
+		} else if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Offsetted") != "yes") {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Current", "Destroy"); //Destroy current rotating actors
+		} else {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Irrelevant"); //all existing Apex_Attach actors becomes "Old"
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "RefSet ::scope.Host ::Host");
+		}
+
+		presetCoords = LibapxUnitGetLastAttachVal(UnitGroupLoopCurrent());
+
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Old", "AliasAdd Apex_Attach_Irrelevant"); //all existing Apex_Attach actors becomes "Old"
+		//Step Two: copy the attachment of the current actor, but instead with an Apex_Attach model actor
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::Main", "AttachModelOffset Apex_Attach Invisible Origin 0,0,0"); //attaching the apex_attach actor first
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_New", "RefSet ::scope.RotatorHost"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		if ( DataTableGetString(true,FixedToString(UnitGetCustomValue(UnitGroupLoopCurrent(), gv_LibapxUnitIndexId), 0) + "_Rotated") == "yes"){
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::scope.Host", "AttachOffset Apex_Attach_New " + presetCoords); 
+		} else {
+			ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"::scope.Host", "AttachOffset Apex_Attach_New " + presetCoords); 
+		}
+		
+		// LibapxPrintOutput(user, "->::Host AttachOffset Apex_Attach_New " + LibapxUnitGetLastAttachVal(UnitGroupLoopCurrent()));
+
+		//Step Three: IDK
+		// ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+		// ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_New", "AttachModelOffset Apex_Attach Invisible Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+		// ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+		// ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+		UnitGroupLoopStep();
+	}
+	UnitGroupLoopEnd();
+    //Strings-words start at 1
+    //1 = command
+    //2 = starting syntx
+    i = 2;
+    while(StringWord(argv, i) != "") {
+        //We break apart
+        temp = StringWord(argv, i);
+        if(modYpr) {
+            if (StringFind(temp, "y", c_stringNoCase) != -1) {
+                temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
+
+                for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+                     attachRotatorZ(StringToInt(temp), !modB, UnitGroupUnit(u, j),useModel);
+                }
+            }
+            if (StringFind(temp, "p", c_stringNoCase) != -1) {
+
+                temp = StringReplace(temp, "", StringFind(temp, "p", c_stringNoCase), StringFind(temp, "p", c_stringNoCase) );
+    
+                for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+                    attachRotatorY(StringToInt(temp), !modB, UnitGroupUnit(u, j),useModel);
+               }
+            }
+            if (StringFind(temp, "r", c_stringNoCase) != -1) {
+
+                temp = StringReplace(temp, "", StringFind(temp, "r", c_stringNoCase), StringFind(temp, "r", c_stringNoCase) );
+    
+                for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+                    attachRotatorX(StringToInt(temp), !modB, UnitGroupUnit(u, j),useModel);
+               }
+            }
+        }
+        else {
+            if (StringFind(temp, "x", c_stringNoCase) != -1) {
+
+                temp = StringReplace(temp, "", StringFind(temp, "x", c_stringNoCase), StringFind(temp, "x", c_stringNoCase) );
+    
+                for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+                     attachRotatorX(StringToInt(temp), !modB, UnitGroupUnit(u, j),useModel);
+                }
+                
+            }
+            if (StringFind(temp, "y", c_stringNoCase) != -1) {
+
+                temp = StringReplace(temp, "", StringFind(temp, "y", c_stringNoCase), StringFind(temp, "y", c_stringNoCase) );
+    
+                for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+                    attachRotatorY(StringToInt(temp), !modB, UnitGroupUnit(u, j),useModel);
+               }
+            }
+            if (StringFind(temp, "z", c_stringNoCase) != -1) {
+
+                temp = StringReplace(temp, "", StringFind(temp, "z", c_stringNoCase), StringFind(temp, "z", c_stringNoCase) );
+    
+                for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+                    attachRotatorZ(StringToInt(temp), !modB, UnitGroupUnit(u, j),useModel);
+               }
+            }
+        }
+        i += 1;
+    }
+
+    //Reform argv
+    if(modYpr) {
+        argv = argv + " -ypr";
+    }
+    if(modB) {
+        argv = argv + " -b";
+    }
+    for (j = 1; j <= UnitGroupCount(u, c_unitCountAll); j += 1) {
+        if(!nocache) {
+            LibapxUnitCacheUpdate(UnitGroupUnit(u, j), "@rotator", argv);
+        }
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupUnit(u, j)),"Apex_Attach", "AliasAdd Apex_Attach_Current"); //now ALL Apex_Attach actors are labeled "Current" including most recent one.
+		ActorSendTo(libNtve_gf_MainActorofUnit(UnitGroupUnit(u, j)),"Apex_Attach_Irrelevant", "AliasRemove Apex_Attach_Current"); //all "Irrelevant" actors discard the "Current" label EXCEPT the most recent added
+		DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupUnit(u, j), gv_LibapxUnitIndexId), 0) + "_Rotated", "yes");
+		DataTableSetString(true, FixedToString(UnitGetCustomValue(UnitGroupUnit(u, j), gv_LibapxUnitIndexId), 0) + "_Offsetted", "no");
+		// LibapxUnitSetLastAttachVal(UnitGroupUnit(u, j),"::Host", "Origin", "", "", "", "");
+    }
+	
+
+}
+void LibapxDefineNewRotation(string commandName) {
+    LibapxCommandsGuideEntrySet(
+        gv_CommandsGuideEntryActor, 
+        commandName, 
+        " This command rotates the current ::Main actor <br> by attaching ModelAddition actors <br> which should not interfere with the actor <br> heirarchy like @rotation would <br> <c val=\"FFE5C9\">Modifiers:</c> <br> -ypr: This changes it's xyz inputs into yaw pitch roll inputs <br> <c val=\"FFFF00\">-nocache:</c> This makes the command no longer store in the units caches. <br> <c val=\"FFE5C9\">Examples:</c> <br> @rotator 30y <br> @rotator 90y 10z <br> @rotator 90x 35z 190y <br> @rotator -ypr 90y 32p 15r "    
+	);
+}
+//Helper commands for rotation
+void attachRotatorX(int degrees, bool absScale, unit u, bool useModel) {
+    int pointNum;
+    string attachPoint = "";
+    string rotation = "0,0,0";
+    //X is Target_01-08
+    //Y is Hit_01-08
+    //Z is Hardpoint_01-08
+    string actorName = "Beacon_Apex";
+    int degreesAbs = AbsI(degrees);
+    if(absScale) {
+        actorName = "Apex_Attach";
+    }
+    while(degreesAbs > 360 || degreesAbs == 360) {
+        degreesAbs -= 360;
+    }
+
+    if(degrees < 0) {
+        degrees = 360-degreesAbs;
+    }
+    else {
+        degrees = degreesAbs;
+    }
+
+    //Generate Attach Point Based off of rotation amt
+    pointNum = degrees/45 + 1;
+    attachPoint = "{Target " + IntToString(pointNum) + "}";
+
+
+    //point handles >45
+    while(degrees > 45 || degrees == 45) {
+        degrees -= 45;
+    }
+
+
+    //0 through 45 degree rotations are handled by attach model offset's rotation
+    if (degrees != 0) {
+        //Build rotation
+        rotation = "0,-1,-" + FixedToString(Tan(degrees),9);
+    }
+
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" {} Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelSwap Apex_Rotator");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "SetScaleAbsolute 1");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelAllowHitTest 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //Again
+    //AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" Invisible " + attachPoint + " 0,0,0 " + rotation); 
+	//repeat process
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachOffset ::Main {Origin 0} 0,0,0");
+
+	attachRotatorZ(270, absScale, u, useModel);
+}
+
+void attachRotatorZ(int degrees, bool absScale, unit u, bool modelAttach) {
+    int pointNum;
+    string attachPoint = "";
+    string rotation = "0,0,0";
+    //X is Target_01-08
+    //Y is Hit_01-08
+    //Z is Hardpoint_01-08
+    string actorName = "Beacon_Apex";
+    int degreesAbs = AbsI(degrees);
+    if(absScale) {
+        actorName = "Apex_Attach";
+    }
+    while(degreesAbs > 360 || degreesAbs == 360) {
+        degreesAbs -= 360;
+    }
+
+    if(degrees < 0) {
+        degrees = 360-degreesAbs;
+    }
+    else {
+        degrees = degreesAbs;
+    }
+
+
+
+    //Generate Attach Point Based off of rotation amt
+    pointNum = degrees/45;
+    attachPoint = "{Hardpoint " + IntToString(pointNum) + "}";
+
+
+    //point handles >45
+    while(degrees > 45 || degrees == 45) {
+        degrees -= 45;
+    }
+
+
+    //0 through 45 degree rotations are handled by attach model offset's rotation
+    if (degrees != 0) {
+        //Build rotation
+        rotation = "-1," + FixedToString(Tan(degrees+90),9) + ",0";
+    }
+
+
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" {} Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelSwap Apex_Rotator");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "SetScaleAbsolute 1");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelAllowHitTest 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //Again
+    //AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" Invisible " + attachPoint + " 0,0,0 " + rotation); 
+	//repeat process
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachOffset ::Main {Origin 0} 0,0,0");
+}
+void attachRotatorY(int degrees, bool absScale, unit u, bool modelAttach) {
+    int pointNum;
+    string attachPoint = "";
+    string rotation = "0,0,0";
+    //X is Target_01-08
+    //Y is Hit_01-08
+    //Z is Hardpoint_01-08
+    string actorName = "Beacon_Apex";
+    int degreesAbs = AbsI(degrees);
+    if(absScale) {
+        actorName = "Apex_Attach";
+    }
+    while(degreesAbs > 360 || degreesAbs == 360) {
+        degreesAbs -= 360;
+    }
+
+    if(degrees < 0) {
+        degrees = 360-degreesAbs;
+    }
+    else {
+        degrees = degreesAbs;
+    }
+
+
+
+    //Generate Attach Point Based off of rotation amt
+    pointNum = degrees/45+1;
+    attachPoint = "{Hit " + IntToString(pointNum) + "}";
+
+
+    //point handles >45
+    while(degrees > 45 || degrees == 45) {
+        degrees -= 45;
+    }
+
+
+    //0 through 45 degree rotations are handled by attach model offset's rotation
+    if (degrees != 0) {
+        //Build rotation
+        rotation = "0,-1,-" + FixedToString(Tan(degrees),9);
+    }
+
+
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //all existing Apex_Attach actors becomes "Old"
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" {} Origin 0,0,0"); //the "New" Apex_Attach actor attaches another
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New"); //now ALL Apex_Attach actors are labeled "New" including most recent one.
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New"); //all "Old" actors discard the "New" label EXCEPT the most recent
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelSwap Apex_Rotator");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "SetScaleAbsolute 1");
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "ModelAllowHitTest 0");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_Old"); //Again
+    //AttachModelOffset " +attachment + " {} " + attachPoint + " " + offset + " " + rotation + " " + siteops
+    ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachModelOffset "+actorName+" Invisible " + attachPoint + " 0,0,0 " + rotation); 
+	//repeat process
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach", "AliasAdd Apex_Attach_New");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_Old", "AliasRemove Apex_Attach_New");
+	ActorSendTo(libNtve_gf_MainActorofUnit(u),"Apex_Attach_New", "AttachOffset ::Main {Origin 0} 0,0,0");
+
+}
+
+
+
+
+//LibapxCommandGet
+//==========================
+//Sets the default delay for attachments
+void LibapxCommandGet(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
+	int indexCount;
+	int i = 6; //this is just because " Model[" has 6 chars
+	int end = 0;
+	text infoText;
+	string infoString;
+	string category;
+	string findBracket;
+	string choice;
+	//Target Actor
+	string target = "::Main";
+	string val;
+	int paramOffset;
+
+	if (UnitGroupCount(u, c_unitCountAlive) > 1) {
+        LibapxPrintError(user, "Command can only be used on one unit.");
+        return;
+    }
+	
+
+	if( LibapxHasActorRef(StringWord(argv, 2)) ) {
+		target = StringReplaceWord(StringWord(argv, 2),"->","",1,c_stringNoCase);
+		paramOffset = 1;
+	}
+	val = StringWord(argv, 2 + paramOffset);
+	val = StringCase(StringSub(val, 1, 1), true) + StringSub(val, 2, StringLength(val));
+
+	category = StringWord(argv,2 + paramOffset);
+
+
+
+
+	if (StringWord(argv,2) == "" ){
+		LibapxPrintError(user,"Please Provide a Field  Input");
+		LibapxPrintText(PlayerGroupSingle(user),StringToText("<c val=\"1abc9c\">Usage</c>: @get ( Model | Actor | SiteOps | Host | Full )"));
+		return;
+	}
+	
+
+
+	// TODO: Add a function to find all available fields.
+
+
+	UnitGroupLoopBegin(u);
+	while(!UnitGroupLoopDone()) {
+		category = category + "[";
+		i = StringLength(category);
+		infoText = ActorGetText(ActorFromActor(libNtve_gf_MainActorofUnit(UnitGroupLoopCurrent()),target));
+		infoString = TextToString(infoText);
+
+		if (StringContains(category,"Full",c_stringAnywhere,c_stringNoCase)){
+			LibapxPrintOutput(user,"<c val=\"1abc9c\">Actor Properties:</c><n>" + StringReplaceWord(StringReplaceWord(infoString,"]","<c val=\"1abc9c\">]<n>",c_stringReplaceAll,c_stringCase),"[","[</c>",c_stringReplaceAll,c_stringCase));
+			return;
+		}
+		else if (StringContains(category,"Model",c_stringAnywhere,c_stringNoCase)){
+		choice = "Actor Model: ";
+		}
+		else if (StringContains(category,"Actor",c_stringAnywhere,c_stringNoCase)){
+			LibapxPrintOutput(user,"<c val=\"1abc9c\">Actor: " + StringReplaceWord(StringReplaceWord(StringWord(infoString,4),"]","<c val=\"1abc9c\">]",c_stringReplaceAll,c_stringCase),"[","[</c>",c_stringReplaceAll,c_stringCase));
+			return;
+		}
+		else if (category == "" || !StringContains(infoString,category,c_stringAnywhere,c_stringNoCase)){
+			LibapxPrintError(user,"Field Unavailable");
+			LibapxPrintText(PlayerGroupSingle(user),StringToText("<c val=\"1abc9c\">Usage</c>: @get ( Model | Actor | SiteOps | Host | Full )"));
+			return;
+		} 
+		else {
+			choice = "Actor" + category + ":";
+		}
+		
+		indexCount = StringFind(infoString,category,c_stringNoCase) -1;
+		
+		//make a loop that keeps increasing a number based on string position until it finds a closing bracket ("]")
+		for (i = indexCount; findBracket != "]"; i+=1 ) {
+			findBracket = StringSub(infoString, i,i);
+			// LibapxPrintOutput(user,findBracket);
+			end = end + 1;
+		}
+
+		infoString = StringSub(infoString, indexCount + StringLength(category), indexCount + end);
+		infoString = StringSub(infoString,2,StringLength(infoString)-2);
+
+		//Actual Result
+		LibapxPrintOutput(user, "<c val=\"1abc9c\">" + choice + "</c> " + infoString);
+
+		// // Debug Count Print
+		// LibapxPrintOutput(user,IntToString(indexCount + StringLength(category)));
+		// LibapxPrintOutput(user,IntToString(indexCount + i));
+
+
+		UnitGroupLoopStep();
+		
+	}
+	UnitGroupLoopEnd();
+
+	
+
+	
+	
+
+
+}
+void LibapxDefineGet(string commandName) {
+	LibapxCommandsGuideEntrySet(
+	 	gv_CommandsGuideEntryGeneral, 
+		commandName, 
+		"Provides select information about the unit (eg. Model) <br> @get [...] <br> Examples: <br> @get actor <br> @get ->base model "
+	);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

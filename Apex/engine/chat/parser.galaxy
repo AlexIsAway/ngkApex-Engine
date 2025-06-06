@@ -12,7 +12,7 @@ include "apex/engine/chat/alias.galaxy"
 include "apex/engine/chat/macro.galaxy"
 
 const string gv_LibapxChatcommandPrefix = "LibapxCommand_";
-static const string BracketCommands = "@cache _delay _api >condition >repeat >chance >random >keypress >moveto >event >set >sequence @order";
+static const string BracketCommands = "@cache _delay _api >condition >repeat >chance >random >keypress >moveto >event >set >sequence @order @offset >convert @reattach _unitvarset _varset";
 
 
 // LibapxArg
@@ -50,7 +50,7 @@ typedef funcref<LibapxCommandGuideSignature> LibapxCommandGuide;
 //
 // Array length hardcoded such that num of commands registered should never
 // reach command table size. If it does, increase this array size.
-LibapxCommandType[250] gv_LibapxCommandTable;
+LibapxCommandType[250] gv_LibapxCommandTable; 
 
 // Counter for the next free array entry in the gv_LibapxCommandTable array
 int gv_gv_LibapxCommandTableCounter = 0;
@@ -140,9 +140,24 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 						msg = "";
 						break;
 					}
-				}
+				}	
 				//If semicolon is within brackets, skip to next
 				if( LibapxVariableWithinBraceCheck( msg, semicolonIndex) ) {
+					nextSemicolonIndex = StringFind( StringSub( msg, semicolonIndex + 1, StringLength(msg) ), ";", c_stringNoCase );
+					if( nextSemicolonIndex > 0 ) {
+						// must add because nextSemicolonIndex is relative to a substring
+						semicolonIndex = semicolonIndex + nextSemicolonIndex;
+						continue;
+					}
+
+					else { // at end of msg
+						current = msg;
+						msg = "";
+						break;
+					}
+				}	
+				//If semicolon is within brackets, skip to next - NGO'S STRING CHECKER
+				if( LibapxVarStringBracketCheck( msg, semicolonIndex) ) {
 					nextSemicolonIndex = StringFind( StringSub( msg, semicolonIndex + 1, StringLength(msg) ), ";", c_stringNoCase );
 					if( nextSemicolonIndex > 0 ) {
 						// must add because nextSemicolonIndex is relative to a substring
@@ -190,6 +205,12 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 
 
+		// parsing ngokerz string brackets, before actual bracket texts are parsed. (eg. >repeat $[2] [@spawn marine])
+		// LibapxPrintOutput(player,current);
+		current = LibapxVarStringParse(current, gv_LibapxPlayerParser[player][spawningCount].context, player);
+
+
+
 		//pull bracket pairs and remove
 		i = 1;
 		bracketText = "";
@@ -230,7 +251,7 @@ void LibapxChatParse(string msg, int player, unitgroup target, int spawningCount
 
 		//Logic for breaking down variables
 		current = LibapxVariableParse(current, gv_LibapxPlayerParser[player][spawningCount].context, player);
-
+		
 
 
 

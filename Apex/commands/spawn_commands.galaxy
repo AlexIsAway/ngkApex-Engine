@@ -156,8 +156,8 @@ void LibapxDefineRegionSpawn(string commandName) {
 //LibapxCommandSpawnPlus
 void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCount, string bracketText) {
 	point spawnPoint = gv_LibapxPlayer[user].mousePosition;
-	int count = StringToInt( StringWord(argv, 2) );
-	string type = StringWord(argv, 3);
+	int count = StringToInt( StringWord(argv, 3) );
+	string type = StringWord(argv, 2);
 	region location = null;
 	int player = user;
 	string parameter;
@@ -192,10 +192,9 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 
 	// if count is 0, try checking 3rd index, swap unit type to 2nd index
 	// (this allows either @spawn # unit or @spawn unit #)
-	if( count == 0 ) {
-		count = StringToInt( StringWord(argv, 3) );
-		type = StringWord(argv, 2);
-	}
+
+	type = StringWord(argv, 2);
+
 
 	// get unit type
 	if( type == "" ) {
@@ -204,11 +203,16 @@ void LibapxCommandSpawnPlus(int user, unitgroup u, string argv, int spawningCoun
 	}
 
 	else {
-		type = UnitTypeFromString(type);
-		//type = librtprCatalogGet( c_gameCatalogUnit, type );
-		if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
-			LibapxPrintError(user, "INVALID UNIT TYPE");
-			return;
+		if (LibapxCatalogGet(c_gameCatalogUnit,type) != "") {
+			type = LibapxCatalogGet(c_gameCatalogUnit,type);
+		}
+		else {
+			type = UnitTypeFromString(type);
+			//type = librtprCatalogGet( c_gameCatalogUnit, type );
+			if (type == "" || !CatalogEntryIsValid(c_gameCatalogUnit, type) || UnitTypeTestFlag(type, c_unitFlagMissile) ) {
+				LibapxPrintError(user, "INVALID UNIT TYPE");
+				return;
+			}
 		}
 	}
 

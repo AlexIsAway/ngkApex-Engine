@@ -5,6 +5,11 @@
 // This software is distributed under the MIT License:
 // <http://opensource.org/licenses/MIT>
 //=========================================================
+
+//Include prototypes
+include "apex/engine/chat/globals/prototypes.galaxy"
+
+
 include "apex/engine/globals.galaxy"
 include "apex/engine/engine.galaxy"
 include "apex/commands/commands.galaxy"

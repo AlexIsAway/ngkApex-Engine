@@ -7,38 +7,88 @@
 //=========================================================
 
 
-//Parser Variable Data Table
-const string gv_LibapxVariableDataTablePrefix = "LibapxVariable_";
-void LibapxVariableSet(string name, string value) {
-    name = gv_LibapxVariableDataTablePrefix + name;
-    if(DataTableValueExists(true, name)) {
-        DataTableValueRemove(true, name);
-        DataTableSetString(true, name, value);
+// Parser Global Variable Data Table
+const string gv_LibapxVariableMapPrefix = "LibapxGlobalVariable_";
+void LibapxGlobalVariableSet(int p, string name, string value) {
+
+    LibapxTManagerSetString(gv_LibapxVariableMapPrefix + IntToString(p), name, value);
+}
+
+void LibapxGlobalVariableRemove(int p, string name) {
+
+    LibapxTManagerRemoveValue(gv_LibapxVariableMapPrefix + IntToString(p), name);
+}
+
+static string GetGlobalVariableValue(string name, int p) {
+    return LibapxTManagerGetString(gv_LibapxVariableMapPrefix + IntToString(p), name);
+}
+
+
+static bool GlobalVariableExists(string name, int p) {
+    return LibapxTManagerExists(gv_LibapxVariableMapPrefix + IntToString(p), name);
+}
+
+
+
+// Parser Local Variable Data Table
+const string gv_LibapxUnitVariableMapPrefix = "LibapxUnitVariable_";
+void LibapxUnitVariableSet(unit u, string name, string value) {
+	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); 
+    
+    LibapxTManagerSetString(gv_LibapxUnitVariableMapPrefix + unitId, name, value);
+}
+
+void LibapxUnitVariableRemove(unit u, string name) {
+	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); 
+    
+    LibapxTManagerRemoveValue (gv_LibapxUnitVariableMapPrefix + unitId, name);
+}
+
+static string GetUnitVariableValue(string name, unit u) {
+	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); 
+
+    return LibapxTManagerGetString(gv_LibapxUnitVariableMapPrefix + unitId, name);
+}
+
+
+static bool UnitVariableExists(string name, unit u) {
+	string unitId = FixedToString(UnitGetCustomValue(u, 0), 0); 
+    
+    return LibapxTManagerExists(gv_LibapxUnitVariableMapPrefix + unitId, name);
+}
+
+const string gv_LibapxVariableDataTablePrefix = "LibapxVariable_"; 
+void LibapxVariableSet(string name, string value) { 
+    name = gv_LibapxVariableDataTablePrefix + name;  
+    if(DataTableValueExists(true, name)) { 
+        DataTableValueRemove(true, name); 
+        DataTableSetString(true, name, value); 
     }
-    else {
-        DataTableSetString(true, name, value);
+    else { 
+        DataTableSetString(true, name, value); 
     }
 }
 
-static bool VariableExists(string name) {
-    return DataTableValueExists(true, gv_LibapxVariableDataTablePrefix + name);
+static bool VariableExists(string name) { 
+    return DataTableValueExists(true, gv_LibapxVariableDataTablePrefix + name); 
 }
-static string GetVariableValue(string name) {
-    return DataTableGetString(true, gv_LibapxVariableDataTablePrefix + name);
+static string GetVariableValue(string name) { 
+    return DataTableGetString(true, gv_LibapxVariableDataTablePrefix + name); 
 }
 
 //Parsing Variable Function Table Creator
 // =======================================================
 //
-const string gv_LibapxVariableFunctionDatatablePrefix = "LibapxVariableFunction_";
+const string gv_LibapxVariableFunctionDatatablePrefix = "LibapxVariableFunction_"; 
+const string gv_LibapxVariableFunctionMapPrefix = "LibapxVariableFunction_";
 
 
 // function signature for Apex Variable Functions
-string LibapxVariableFunctionSignature(int p, unitgroup u, string argv); //argv is space seperatored, argv 0
+string LibapxVariableFunctionSignature(int p, unitgroup u, string argv); 
 
 
 // funcref type for Apex Variable Functions
-typedef funcref<LibapxVariableFunctionSignature> LibapxVariableFunctionType;
+typedef funcref<LibapxVariableFunctionSignature> LibapxVariableFunctionType; 
 
 
 // Counter for the next free array entry in the gv_LibapxVariableFunctionTable array
@@ -47,10 +97,15 @@ int gv_LibapxVariableFunctionTableCounter = 0;
 //Table of all constants
 LibapxVariableFunctionType[250] gv_LibapxVariableFunctionTable;
 
-void LibapxVariableFunctionCreate(string varFunctionName, LibapxVariableFunctionType func) {
-	DataTableSetInt(true, gv_LibapxVariableFunctionDatatablePrefix + gv_LibapxVariableFunctionPrefix + StringCase(varFunctionName, false), gv_LibapxVariableFunctionTableCounter);
-	gv_LibapxVariableFunctionTable[gv_LibapxVariableFunctionTableCounter] = func;
-	gv_LibapxVariableFunctionTableCounter += 1;
+void LibapxVariableFunctionCreate(string varFunctionName, LibapxVariableFunctionType func) { 
+	DataTableSetInt(true, gv_LibapxVariableFunctionDatatablePrefix + gv_LibapxVariableFunctionPrefix + StringCase(varFunctionName, false), gv_LibapxVariableFunctionTableCounter); 
+	gv_LibapxVariableFunctionTable[gv_LibapxVariableFunctionTableCounter] = func; 
+	gv_LibapxVariableFunctionTableCounter += 1; 
+}
+void LibapxStringFunctionCreate(string varFunctionName, LibapxVariableFunctionType func) { 
+	DataTableSetInt(true, gv_LibapxVariableFunctionDatatablePrefix + gv_LibapxStringFunctionPrefix + StringCase(varFunctionName, false), gv_LibapxVariableFunctionTableCounter); 
+	gv_LibapxVariableFunctionTable[gv_LibapxVariableFunctionTableCounter] = func; 
+	gv_LibapxVariableFunctionTableCounter += 1; 
 }
 
 
@@ -219,6 +274,8 @@ static string ParseVariableFunctionStatement(string input, unitgroup ug, int p) 
     string entireFunctionReplacer = "";
     string funcOutput;
     string evaluationCandidate = SpaceOperatorsForReplacement(input);
+    unit u;
+    bool useEvaluator = true;
 
 
     while(StringWord(evaluationCandidate, i) != "") {
@@ -234,91 +291,112 @@ static string ParseVariableFunctionStatement(string input, unitgroup ug, int p) 
         }
 
         
-        if(StringSub(current,1,1) == gv_LibapxVariableFunctionPrefix) {
-            funcKey = gv_LibapxVariableFunctionDatatablePrefix + StringCase(current, false);
-            if(DataTableValueExists(true, funcKey)) {
-                funcParameters = GetParamsFromFunction(evaluationCandidate, StringFind(evaluationCandidate, current, false) + StringLength(current));
-                
+        if(LibapxTManagerExists(gv_LibapxVariableFunctionMapPrefix, StringCase(current, false))) {
+            funcParameters = GetParamsFromFunction(evaluationCandidate, StringFind(evaluationCandidate, current, false) + StringLength(current));
+            
 
 
-                if(funcParameters == "FAULT") {
-                    i += 1;
-                    LibapxPrintError(EventPlayer(), "\'" + current + "\', Malformed Function, terminating variable parsing");
-                    return "ERR_MALFORMED_FUNCTION";
+            if(funcParameters == "FAULT") {
+                i += 1;
+                if(gv_LibapxPlayer[p].helpMessages) {
+                LibapxPrintError(p, "\'" + current + "\', Malformed Function, terminating variable parsing");
                 }
+                return "0";
+            }
 
 
 
-                entireFunctionReplacer  = LibapxStringTrim(SpaceOperatorsForReplacement(current+"("+funcParameters+")"));
+            entireFunctionReplacer  = LibapxStringTrim(SpaceOperatorsForReplacement(current+"("+funcParameters+")"));
 
-                if(StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase) != -1) {
-                    evaluationCandidate = StringReplace(
-                        evaluationCandidate, 
-                        "[FN_REPLACED]", 
-                        StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase), 
-                        StringLength(entireFunctionReplacer)+StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase)
-                    );
+            if(StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase) != -1) {
+                evaluationCandidate = StringReplace(
+                    evaluationCandidate, 
+                    "[FN_REPLACED]", 
+                    StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase), 
+                    StringLength(entireFunctionReplacer)+StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase)
+                );
 
+            }
+            else {
+                LibapxPrintError(p, current+" //UNABLE TO FIND [FN_REPLACED], NOTIFY SEROBLISS");
+                return "0";
+            }
+            
+            //For each functionParameter
+            //If string is a fixed
+            //Parameter is good, carry on
+            //Else if string is NOT fixed, recursively parse
+            j = 1;
+            while(StringWord(funcParameters, j) != "") {
+                funcParameter = StringWord(funcParameters, j);
+                
+                j += 1;
+                
+                funcParameters = StringReplaceWord(
+                    funcParameters, 
+                    funcParameter, 
+                    ParseVariableFunctionStatement(funcParameter, ug, p), 
+                    1, 
+                    c_stringNoCase
+                );
+            }
+
+            
+            
+            funcIndex = LibapxTManagerGetInt(gv_LibapxVariableFunctionMapPrefix, StringCase(current, false));
+
+            // TODO: Pass in actual unit group;
+            funcOutput = gv_LibapxVariableFunctionTable[funcIndex](p, ug, funcParameters);
+
+            evaluationCandidate = StringReplaceWord(evaluationCandidate, "[FN_REPLACED]", funcOutput, 1, c_stringNoCase);
+
+            
+
+            //Do not iterate I, so func output will be next iteration as it differs from original string
+            continue;
+        }
+
+
+            //Global Variables(lv.varName will stop attempted global variable finding and using)
+            if(StringSub(current, 1, 3) != "lv.") {
+                if(GlobalVariableExists(current, p)) {
+                    evaluationCandidate = StringReplaceWord(evaluationCandidate, current, GetGlobalVariableValue(current, p), 1, c_stringNoCase); 
+                    continue;
                 }
-                else {
-                    LibapxPrintError(EventPlayer(), current+" //UNABLE TO FIND [FN_REPLACED], NOTIFY SEROBLISS");
-                    return "ERR_UNKNOWN";
-                }
-                
-                //For each functionParameter
-                //If string is a fixed
-                //Parameter is good, carry on
-                //Else if string is NOT fixed, recursively parse
-                while(StringWord(funcParameters, j) != "") {
-                    funcParameter = StringWord(funcParameters, j);
-                    j += 1;
+            }
+            else {
+                //If lv. remove from current
+                current = StringReplace(current, "", 1, 3);
+                evaluationCandidate = StringReplaceWord(evaluationCandidate,"lv.", "", 1, c_stringCase );
+            }
 
-                    if(!LibapxIsFixed(funcParameter)) {
-                        funcParameters = StringReplaceWord(
-                            funcParameters, 
-                            funcParameter, 
-                            ParseVariableFunctionStatement(funcParameter, ug, p), 
-                            1, 
-                            c_stringNoCase
-                        );
-                    }
-                }
+            //Local variable
+            u = UnitGroupUnit(ug, 1);
 
-                
-                
-                funcIndex = DataTableGetInt(true, funcKey);
 
-                //TODO: Pass in actual unit group;
-                funcOutput = gv_LibapxVariableFunctionTable[funcIndex](p, ug, funcParameters);
-
-                evaluationCandidate = StringReplaceWord(evaluationCandidate, "[FN_REPLACED]", funcOutput, 1, c_stringNoCase);
-
-                
-
-                //Do not iterate I, so func output will be next iteration as it differs from original string
+            if(UnitVariableExists(current, u)) {
+                evaluationCandidate = StringReplaceWord(evaluationCandidate, current, GetUnitVariableValue(current, u), 1, c_stringNoCase); 
                 continue;
             }
             else {
-                LibapxPrintError(EventPlayer(), "\'" + current + "\', Unknown Variable Function, terminating variable parsing");
-                return "ERR_UNKNOWN_VARIABLE_FUNCTION";
+                if(gv_LibapxPlayer[p].helpMessages) {
+                LibapxPrintError(p, "\'" + current + "\', Unknown Variable, terminating variable parsing");
+                }
+                return "";
             }
-        }
-        else {
-            // LibapxPrintSuccess(EventPlayer(), evaluationCandidate+" //EVALUATION CANDIDATE 3");
-            if(VariableExists(current)) {
-                evaluationCandidate = StringReplaceWord(evaluationCandidate, current, GetVariableValue(current), 1, c_stringNoCase); 
-                continue;
-            }
-            else {
-                LibapxPrintError(EventPlayer(), "\'" + current + "\', Unknown Variable, terminating variable parsing");
-                return "ERR_UNKNOWN_VARIABLE";
-            }
-        }
+            
+            
+
+
         i += 1;
     }
 
-
-    return LibapxUtilsInfixEvaluator(evaluationCandidate);
+    if(useEvaluator) {
+        return LibapxUtilsInfixEvaluator(evaluationCandidate);
+    }
+    else {
+        return evaluationCandidate;
+    }
 }
 
 
@@ -364,4 +442,403 @@ string LibapxVariableParse(string input, unitgroup ug, int p) {
 
     return "ERR CODE SHOULD NO REACH HERE";
 } 
+
+//Parsing Handlers below for Ngo's String Parser
+// =======================================================
+//
+static const string gv_LibapxStringParserStartString = "$[";
+static const string gv_LibapxStringParserEndString = "]";
+
+//Checks if prefixed and postfixed $[anything inside this would return true]
+bool LibapxVarStringBracketCheck(string stringToCheck, int currentIndex) {
+	string stringBefore = StringSub(stringToCheck, 1, currentIndex - 1);
+	string stringAfter = StringSub(stringToCheck,  currentIndex + 1, StringLength(stringToCheck));
+	int i = 1;
+	string temp;
+	int openI = 0;
+	int closeI = 0;
+	bool opened = false;
+	bool closed = false;
+    int stringBeforeEndIndex = StringFind(stringBefore, gv_LibapxStringParserEndString, c_stringNoCase);
+    int stringBeforeStartIndex = StringFind(stringBefore, gv_LibapxStringParserStartString, c_stringNoCase);
+    int stringAfterEndIndex = StringFind(stringAfter, gv_LibapxStringParserEndString, c_stringNoCase);
+    int stringAfterStartIndex = StringFind(stringAfter, gv_LibapxStringParserStartString, c_stringNoCase);
+
+	if (
+        (stringBeforeStartIndex != -1) 
+        &&
+        (stringBeforeStartIndex > stringBeforeEndIndex)
+        &&
+        (stringAfterEndIndex != -1)
+        && 
+        ((stringAfterEndIndex < stringAfterStartIndex) || (stringAfterStartIndex == -1))
+        ) {
+        return true;
+	}
+	return false;
+}
+
+static string GetParamsFromStringFunction(string input, int startOfFunc) { 
+    string stringToParse = LibapxStringTrim(StringSub(input, startOfFunc, StringLength(input)));  // I think this is it. Example: (Boy I can't eat dis,19)
+    int i = 1;
+    int paranthesisLevel = 0;
+    string current;
+    string output = "";
+    //RETURN GROUPED FUNCTION PARAMETERS
+    // DebugLog( "[" + stringToParse + "]");
+
+
+    while(StringSub(stringToParse, i, i) != "") { 
+        current = StringSub(stringToParse, i, i); 
+        // DebugLog(current+" // CURR");
+
+        //FIRST ITERATION
+        if(current == "(" && i == 1) {
+            paranthesisLevel += 1;
+            i += 1;
+            // DebugLog("// FIRST ITERATION WAS (");
+            continue;
+        }
+        else if (current != "(" && i == 1) {
+            break;
+        }
+
+        i += 1;
+
+        if(current == "(") {
+            paranthesisLevel += 1;
+            // DebugLog("// PARENTHESIS LEVEL INCREASED");
+        }
+        else if (current == ")") {
+            paranthesisLevel -= 1;
+            // DebugLog( IntToString(paranthesisLevel) + "// PARENTHESIS LEVEL DECREASED");
+            
+            if(paranthesisLevel == 0) {
+                // DebugLog("// END OF PARENTHESIS PAIRS, [RETURNING]");
+                return output;    
+            }
+        }
+
+        // if(paranthesisLevel == 1 && current == ",") {
+        //     // DebugLog("// COMMA FOUND, S P A C I N G");
+        //     output += ","; // original
+        //     // output += ","; //DEBUGGING BY NGO
+        // }
+
+        if(current == " ") {
+            output += current;
+        }
+        else if(current != " ") {
+            output += current;
+        }
+
+        
+        // DebugLog(output + " // CURRENT OUTPUT");
+    }
+
+    return "FAULT";
+}
+
+// //Is valid for variable parsing (might not need to make a new one for strings)
+// static bool IsValidForVarStringParsing(string c) {
+// 	int i = 1;
+// 	string current;
+// 	while(StringWord(gv_LibapxValidOperatorsWithParen + " ,", i) != "") {
+// 		current = StringWord(gv_LibapxValidOperatorsWithParen + " ,", i);
+
+// 		if(current == c) {
+// 			return true;
+// 		}
+// 		i += 1;
+// 	}
+
+// 	return false;
+// } 
+
+
+//Seperates out operators for easy iteration (Ngo's String Parser)
+static string SpaceOperatorsForReplacementStrings(string input) {
+    int j = 1;
+    int i = 1;
+    string currentOp;
+    string current;
+    string output = "";
+    bool matchedOp = false;
+    // string thingsToSpace = gv_LibapxValidOperatorsWithParen + " ,";
+    // string thingsToSpace = " ( ) " + " ,";
+    string thingsToSpace = " ( ) " + " ,";
+
+    
+    for (i = 1; StringSub(input, i, i) != ""; i += 1) {
+		current = StringSub(input, i, i);
+        matchedOp = false;
+
+        j = 1;
+        while(StringWord(thingsToSpace, j) != "") {
+            currentOp = StringWord(thingsToSpace, j);
+            if(currentOp == current) {
+                output += " "+currentOp+" ";
+                output = output;
+                matchedOp = true;
+                break;
+            }
+            j += 1;
+        }
+        if(!matchedOp && current != "") {
+            output += current;
+            // output = LibapxStringTrim(output);
+        }
+    }
+    // return LibapxStringTrim(output);
+    return (output);
+
+}
+
+static string ParseVarStringFunctionStatement(string input, unitgroup ug, int p) {
+    int i = 1;
+    int j = 1;
+    string current = "";
+    string funcKey;
+    int funcIndex = 0;
+    string funcParameters = "";
+    string funcParameter = "";
+    string entireFunctionReplacer = "";
+    string funcOutput;
+    // //original
+    string evaluationCandidate = SpaceOperatorsForReplacementStrings(input); // this is what causes $functions to be read
+    //WIP
+    // string evaluationCandidate = input;
+    unit u;
+    bool useEvaluator = true;
+
+
+    while(StringWord(evaluationCandidate, i) != "") {
+        current = StringWord(evaluationCandidate, i);
+       
+        if(
+            IsValidForVariableParsing(current)
+            || // OR //
+            LibapxIsFixed(current)
+        ) {
+            i += 1;
+            continue;
+        }
+
+        // Debug: Space Formatting starts past here
+        
+        if(LibapxTManagerExists(gv_LibapxVariableFunctionMapPrefix, StringCase(current, false))) {
+            //Problems with the funcParameters start here (it removes spaces)
+            // DebugLog(evaluationCandidate);
+            funcParameters = GetParamsFromStringFunction(evaluationCandidate, StringFind(evaluationCandidate, current, false) + StringLength(current)); //this removes spaces T_T
+
+            // DebugLog(funcParameters);
+            // DebugLog(funcParameters + IntToString(StringFind(evaluationCandidate, current, false) + StringLength(current)));
+
+
+            if(funcParameters == "FAULT") {
+                i += 1;
+                if(gv_LibapxPlayer[p].helpMessages) {
+                LibapxPrintError(p, "\'" + current + "\', Malformed Function, terminating variable parsing");
+                }
+                return "0";
+            }
+
+
+
+            // entireFunctionReplacer  = LibapxStringTrim(SpaceOperatorsForReplacementStrings(current+"("+funcParameters+")"));
+
+            // Original Form
+            // entireFunctionReplacer  = LibapxStringTrim(SpaceOperatorsForReplacement(current+"("+funcParameters+")"));
+            // entireFunctionReplacer  = LibapxStringTrim(SpaceOperatorsForReplacementStrings(current+"("+funcParameters+")"));
+            entireFunctionReplacer  = LibapxStringTrim(current+" ("+funcParameters+")");
+            // DebugLog(entireFunctionReplacer + "stupidshit");
+
+
+            // Screw it
+            // entireFunctionReplacer  = [FN_REPLACED];
+
+            
+        
+
+
+            // // What works so far W.I.P:
+            // entireFunctionReplacer  = current+"("+funcParameters+")";
+
+            // LibapxPrintOutput(p,"Replacing: <n>" + evaluationCandidate); // DEBUGGING
+            // LibapxPrintOutput(p,"With: <n>" + entireFunctionReplacer); // DEBUGGING
+
+
+
+            // ISSUE: the replacer parameter contents still doesn't match the one in candidate. 
+           //  because the spaces are being removed.
+            
+            if(StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase) != -1) {
+                evaluationCandidate = StringReplace(
+                    evaluationCandidate, 
+                    "[FN_REPLACED]", 
+                    StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase), 
+                    StringLength(entireFunctionReplacer)+StringFind(evaluationCandidate, entireFunctionReplacer, c_stringNoCase)
+                );
+
+
+            }
+            else {
+                LibapxPrintError(p, current+" //UNABLE TO FIND [FN_REPLACED], NOTIFY SEROBLISS");
+                return "0";
+            }
+            
+            //For each functionParameter
+            //If string is a fixed
+            //Parameter is good, carry on
+            //Else if string is NOT fixed, recursively parse
+            j = 1;
+            while(StringWord(funcParameters, j) != "") {
+                funcParameter = StringWord(funcParameters, j);
+                
+                j += 1;
+                
+                funcParameters = StringReplaceWord(
+                    funcParameters, 
+                    funcParameter, 
+                    ParseVarStringFunctionStatement(funcParameter, ug, p), 
+                    1, 
+                    c_stringNoCase
+                );
+            }
+
+            
+            
+            funcIndex = LibapxTManagerGetInt(gv_LibapxVariableFunctionMapPrefix, StringCase(current, false));
+
+            // TODO: Pass in actual unit group;
+            funcOutput = gv_LibapxVariableFunctionTable[funcIndex](p, ug, funcParameters);
+
+            evaluationCandidate = StringReplaceWord(evaluationCandidate, "[FN_REPLACED]", funcOutput, 1, c_stringNoCase);
+
+            
+
+            //Do not iterate I, so func output will be next iteration as it differs from original string
+            continue;
+        }
+
+        
+        //this is where it's trying to find variables (I got the string parser to work here)
+
+        else if(StringSub(current,1,1) == "&") {
+            current = StringSub(current, 2, StringLength(current));
+            //Global Variables(lv.varName will stop attempted global variable finding and using)
+            if(StringSub(current, 1, 3) != "lv.") {
+                if(GlobalVariableExists(current, p)) {
+                    evaluationCandidate = StringReplaceWord(evaluationCandidate, "&" + current, GetGlobalVariableValue(current, p), 1, c_stringNoCase); 
+                    continue;
+                }
+            }
+            else {
+                //If lv. remove from current
+                current = StringReplace(current, "", 1, 3);
+                evaluationCandidate = StringReplaceWord(evaluationCandidate,"lv.", "", 1, c_stringCase );
+            }
+
+            //Local variable
+            u = UnitGroupUnit(ug, 1);
+
+            
+            if(UnitVariableExists(current, u)) {
+                evaluationCandidate = StringReplaceWord(evaluationCandidate, "&" + current, GetUnitVariableValue(current, u), 1, c_stringNoCase); 
+                continue;
+            }
+            else {
+                if(gv_LibapxPlayer[p].helpMessages) {
+                LibapxPrintError(p, "\'" + current + "\', Unknown Variable, terminating variable parsing.");
+                }
+                return "";
+            }
+        }
+        else if(current != "") {
+            useEvaluator = false;
+        }
+            
+
+        
+        i += 1;
+    }
+
+    // Reformatting it I think (Made by Ngo)
+    evaluationCandidate = StringReplaceWord(evaluationCandidate," , ",",",c_stringReplaceAll,c_stringCase);
+    evaluationCandidate = StringReplaceWord(evaluationCandidate," ( ","(",c_stringReplaceAll,c_stringCase);
+    evaluationCandidate = StringReplaceWord(evaluationCandidate," ) ",")",c_stringReplaceAll,c_stringCase);
+    
+
+    if(useEvaluator) {
+        return LibapxUtilsInfixEvaluator(evaluationCandidate);
+        // return evaluationCandidate;
+    }
+    else {
+        return evaluationCandidate;
+    }
+}
+
+//Replace all valid "string" variable brackets
+string LibapxVarStringParse(string input, unitgroup ug, int p) {
+    int indexOfParseTarget = StringFind(input, gv_LibapxStringParserStartString, c_stringNoCase);
+    int endIndexOfParseTarget = StringFind(
+        StringSub(input, indexOfParseTarget, StringLength(input)),
+        gv_LibapxStringParserEndString, 
+        c_stringNoCase
+    );
+    string currentParse;
+
+    if(indexOfParseTarget != -1) {
+        endIndexOfParseTarget += indexOfParseTarget-2;
+    }
+
+    if(
+        indexOfParseTarget != -1 && endIndexOfParseTarget != -1 &&
+        !LibapxBracketsWithinBracketsSimple(input, indexOfParseTarget)
+    ) {
+        currentParse = StringSub(
+            input, 
+            indexOfParseTarget + StringLength(gv_LibapxStringParserStartString),
+            endIndexOfParseTarget
+            
+        );
+        //This is where it starts using functions.
+
+        // Note: It seems that the first half of the ParseVarStringFunctionStatement() is to blame here.
+       // check and also see if we can circumvent the space operator issue.
+      // it will be a bit challenging as the variable parser is always trying to convert the entire string into 1 variable.
+     
+
+
+        // String Variables Statements W.I.P
+        // currentParse = LibapxUtilsTrimExcessZeros(ParseVarStringFunctionStatement(currentParse, ug, p));
+        currentParse = ParseVarStringFunctionStatement(currentParse, ug, p); //ok zero trim isnt necessary for functions...
+
+
+        // Variable Function Statements (Original).
+        // currentParse = LibapxUtilsTrimExcessZeros(ParseVariableFunctionStatement(currentParse, ug, p));
+
+        // // This is just so that semi-colons can exist. 
+        currentParse = StringReplaceWord(currentParse,";"," ; ",c_stringReplaceAll,c_stringCase);
+        
+        input = StringReplace(
+            input, 
+            currentParse,
+            indexOfParseTarget,
+            endIndexOfParseTarget+StringLength(gv_LibapxStringParserEndString)
+        );
+    
+        return LibapxVarStringParse(input, ug, p);
+    }
+    else {
+        return input;
+    }
+
+    return "ERR CODE SHOULD NO REACH HERE";
+} 
+
+
+
+
+
 

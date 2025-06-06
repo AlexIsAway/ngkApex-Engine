@@ -34,6 +34,9 @@ int LibapxUiChatlogExit;
 int LibapxUiChatlogList;
 static int LibapxUiChatlogFilterLast = 0; // last player check in filter list
 
+// dialog controls for chat camera pan button
+int camerapan;
+
 // LibapxUiChatlogInit
 // ==================
 // Creates the chat log ui panel
@@ -52,6 +55,12 @@ void LibapxUiChatlogInit() {
 	for( i = 0; i < gv_LibapxNumberOfLoggedMessages; i += 1 ) {
 		TriggerAddEventGeneric(TriggerCreate("LibapxUiChatlogUpdate"), gv_LibapxEventChatLog + IntToString(i));
 	}
+
+	//Title Remove Button
+    camerapan = LibapxCreateDialogBtn(LibapxUiChatlog, 30, 30, c_anchorTopLeft, 50, 60, "Locate where this message was said", "" );
+    LibapxCreateDialogBtnIcon(LibapxUiChatlog, camerapan, 20, 20, gv_LibapxUiIconReset);
+    LibapxCreateDialogLabel(LibapxUiChatlog, 200, 30, c_anchorTopLeft, 40, 60, "Location", gv_LibapxUiHeader3);
+    TriggerAddEventDialogControl(TriggerCreate("LibapxUiChatlogCameraPan"), c_playerAny, camerapan, c_triggerControlEventTypeClick);
 }
 
 // LibapxUiChatlogInit
@@ -80,6 +89,11 @@ void LibapxUiChatlogInitPlayer(int player) {
 
 	// set the global var for the last created checkbox
 	LibapxUiChatlogFilterLast = checkbox;
+
+	// Trigger for chatlog message selection
+	// TriggerAddEventDialogControl(TriggerCreate("LibapxUiChatlogCameraPan"), c_playerAny, LibapxUiChatlogList, c_triggerControlEventTypeSelectionChanged);
+	// TriggerAddEventDialogControl(TriggerCreate("LibapxUiChatlogCameraPan"), c_playerAny, LibapxUiChatlogList, c_triggerControlEventTypeSelectionChanged);
+
 }
 
 // UiChatlogPopulate
@@ -137,6 +151,27 @@ bool LibapxUiChatlogFilterToggle(bool testConds, bool runActions) {
 	return true;
 }
 
+// // libNtve_gf_DialogItemText(DialogControlGetSelectedItem,p);
+
+// Event to camerapan to message coordinates
+bool LibapxUiChatlogCameraPan(bool testConds, bool runActions) {
+    int p = EventPlayer();
+	string coords;
+    unitgroup ug = UnitGroupSelected(p);
+	int i =DialogControlGetSelectedItem(LibapxUiChatlogList, p);
+	// string selected = gv_LibapxChatLog;
+
+	
+    ug = UnitGroupFilterPlayer(ug, p, -1);
+    // LibapxPrintOutput(p,gv_LibapxChatLog[i].coords);
+	LibapxChatParse("_camerapan" + gv_LibapxChatLog[i].coords, p, ug, gv_LibapxPlayer[p].spawningCount);
+	UIDisplayMessage(PlayerGroupSingle(p), c_messageAreaSubtitle, StringToText("Test"));
+
+    return true;
+}
+
+
+
 // LibapxUiChatlogUpdate
 // ==================
 // Responds to a gv_LibapxEventChatLog updated chatlog event, where event
@@ -159,9 +194,11 @@ bool LibapxUiChatlogUpdate(bool testConds, bool runActions) {
 		if( PlayerType(player) == c_playerTypeUser && PlayerStatus(player) == c_playerStatusActive ) {
 			if( !gv_LibapxChatLogFilter[player][gv_LibapxChatLog[i].author] ) {
 				DialogControlAddItem(LibapxUiChatlogList, PlayerGroupSingle(player), msg);
+				// libNtve_gf_SetDialogItemTooltip(DialogControlGetItemCount(LibapxUiChatlogList,player), msg, PlayerGroupSingle(player)); //tooltip option
 			}
 		}
 	}
-
+	// DialogControlGetSelectedItem
+	
 	return true;
 }

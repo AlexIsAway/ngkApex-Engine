@@ -26,8 +26,11 @@ void LibapxEventsInitialize() {
 	// mouse related events
 	TriggerAddEventMouseMoved(TriggerCreate("LibapxMouseMoved"), c_playerAny );
 	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseLeftCLickedDown"), c_playerAny, c_mouseButtonLeft, true);
+	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseLeftCLickedUp"), c_playerAny, c_mouseButtonLeft, false);
 	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseRightClickedDown"), c_playerAny, c_mouseButtonRight, true);
 	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseRightClickedUp"), c_playerAny, c_mouseButtonRight, false);
+	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseMiddleClickedDown"), c_playerAny, c_mouseButtonMiddle, true);
+	TriggerAddEventMouseClicked(TriggerCreate("LibapxMouseMiddleClickedUp"), c_playerAny, c_mouseButtonMiddle, false);
 
 	// key press (up and down) events
 	TriggerAddEventKeyPressed(TriggerCreate("LibapxKeyPressedDown"), c_playerAny, c_keyNone, true, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
@@ -90,7 +93,7 @@ void LibapxEventsInitialize() {
 	TriggerAddEventPlayerEffectUsed(TriggerCreate("LibapxUnitEffectUsed"), c_playerAny, null);
 	TriggerAddEventUnitHighlight(TriggerCreate("LibapxUnitHighlightOn"), null, c_playerAny, true);
 	TriggerAddEventUnitHighlight(TriggerCreate("LibapxUnitHighlightOff"), null, c_playerAny, false);
-
+	
 
 }
 

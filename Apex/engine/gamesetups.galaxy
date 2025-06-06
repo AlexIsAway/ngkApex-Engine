@@ -181,6 +181,7 @@ void LibapxGamesetupLoad(int player, string gamesetupName) {
 
 	//loading complete!
 	LibapxPrintSuccess(player, "Game setup loaded: \"" + gamesetupName + "\"");
+	LibapxPrintText(PlayerGroupAll(), gv_LibapxPlayerNameColored(player) + StringToText(" has finished loading their gamesetup."));
 	gGamesetupsLoading -= 1;
 }
 
@@ -217,7 +218,10 @@ string LibapxGamesetupAliasCommands(string s) {
 	aliased = StringReplaceWord(aliased, "@tooltip", "@tt", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@weaponspeedall", "@wpa", c_stringReplaceAll, false);
 	aliased = StringReplaceWord(aliased, "@weaponspeed", "@wp", c_stringReplaceAll, false);
-	
+	aliased = StringReplaceWord(aliased, "@offset", "@oft", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@addability", "@ay", c_stringReplaceAll, false);
+	aliased = StringReplaceWord(aliased, "@rotator", "@rtr", c_stringReplaceAll, false);
+
 	return aliased;
 }
 
@@ -254,6 +258,9 @@ string LibapxGamesetupAliasCommandsUnpack(string aliased) {
 	unpacked = StringReplaceWord(unpacked, "@tt", "@tooltip", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@wpa", "@weaponspeedall", c_stringReplaceAll, false);
 	unpacked = StringReplaceWord(unpacked, "@wp", "@weaponspeed", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@oft", "@offset", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@ay", "@addability", c_stringReplaceAll, false);
+	unpacked = StringReplaceWord(unpacked, "@rtr", "@rotator", c_stringReplaceAll, false);
 	
 	return unpacked;
 }

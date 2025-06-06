@@ -33,7 +33,7 @@ struct LogMsg {
 	text timestamp;	// text formatted timestamp [H:M:S]
 	text msg;		// text formatted message
 	bool isPartOfPrev;	// flag for whether this message part of the previous
-							// useful for multi-line split messages
+	string coords;						// useful for multi-line split messages
 };
 
 LogMsg[gv_LibapxNumberOfLoggedMessages] gv_LibapxChatLog;
@@ -56,11 +56,12 @@ bool gv_gv_LibapxChatLogCycled = false;
 // clients, so there does not have to be any interlocking dependencies between
 // e.g. a chatlog ui and this engine chatlog system.
 // Though events introduces messiness.
-static void ChatlogAdd(int index, int author, text timestamp, text msg, bool partPrev) {
+static void ChatlogAdd(int index, int author, text timestamp, text msg, bool partPrev, string pos) {
 	gv_LibapxChatLog[index].author = author;
 	gv_LibapxChatLog[index].timestamp = timestamp;
 	gv_LibapxChatLog[index].msg = msg;
 	gv_LibapxChatLog[index].isPartOfPrev = partPrev;
+	gv_LibapxChatLog[index].coords = pos;
 
 	// if chat log hasn't cycled and will cycle, check flag for cycled
 	if( !gv_gv_LibapxChatLogCycled && gv_LibapxChatLogCounter == (gv_LibapxNumberOfLoggedMessages - 1) ) {
@@ -133,19 +134,19 @@ int LibapxStringSpaceSubI(string msg, int start, int end) {
 // ===============
 // Conditions an input message into chunks for saving into the chatlog.
 // Used by client to log messages.
-void LibapxLog(int author, text unitname, string msg) {
+void LibapxLog(int author, text unitname, string msg, string pos) {
 	int time = FixedToInt(GameGetMissionTime());
 	text timestamp = StringToText("[" + IntToString( time / 3600 ) + ":" + IntToString( ( time % 3600 ) / 60 ) + ":" + IntToString( time % 60 ) + "] ");
 	string chunk;
 	int idx;
 	int i = 0;
 
-		ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, unitname + StringToText(":"), false);
+		ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, unitname + StringToText(":"), false, pos);
 
 		while( msg != "" ) {
 			i +=1;
 			if( StringFind(msg, " ", c_stringNoCase) == -1 ) {
-				ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(msg), true);
+				ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(msg), true, pos);
 				break;
 			}
 			else if( StringLength(msg) > gv_LibapxLogMessageLength ) {
@@ -153,19 +154,19 @@ void LibapxLog(int author, text unitname, string msg) {
 				if(chunk == " ") {
 					chunk = msg;
 					msg = "";
-					ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(chunk), true);
+					ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(chunk), true, pos);
 					break;
 				}
 				else {
 					idx = LibapxStringSpaceSubI(msg, 1, gv_LibapxLogMessageLength);
 					msg = LibapxStringSpaceSub(msg, idx, StringLength(msg) + 10);
-					ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(chunk), true);
+					ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(chunk), true, pos);
 				}
 				
 			} 
 
 			else {
-				ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(msg), true);
+				ChatlogAdd(gv_LibapxChatLogCounter, author, timestamp, StringToText(msg), true, pos);
 				break;
 			}
 			if(i > 1000) {
